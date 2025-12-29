@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="derma.css">
+</head>
+<body>
+         <nav>
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+
+        <li><a href="derma.html">Home</a></li>
+        <li><a href="about.html">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="contant.html">Contact</a></li>
+        
+    </ul>
+    </nav>
+
+    <div class="details" id="prodactdetalis"></div>
+    <div class="carts" id="cart">
+    <div class="cart_header">
+    YOUR CART
+   <span class="close-cart" onclick="closecart()">x</span>
+
+    </div>
+    <div class="cartitem" id="cartItems"></div>
+    <button onclick="window.location.href='check-out.html'" class="checkout-btn">check out</button>
+    </div>
+ <script>
+    const prodacts= [
+    {id : 1 , name : 'lip balm' , price : 80  , image :"photo_2025-12-14_16-54-57.jpg" ,desc:"With a strawberry scent… the secret to soft lips all day Shea butter: deep nourishment and instant softness Beeswax: locks in moisture and protects against cracking Jojoba oil, Castor oil, Grape seed oil, Vitamin E: keeps lips healthy and prevents dryness."},
+    {id : 2 , name : 'Savings Package' , price : 350   , image :"photo_2025-12-14_16-51-26.jpg",desc: "Winter has arrived... and your skin is calling for hydration. If you still dont have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care. The Complete Hydration Package = everything your body needs. Lip balm protects your lips from chapping and gives a natural rosy color. It’s rich in moisturizing oils, vitamin E, and shea butter for extra hydration. Body butter – any girl who loves the feeling of softness and hydration all over her body, this body butter is for you. Deep hydration, lasting all the time. Body lotion – treats goosebumps, helps renew the skin, and leaves it looking healthy and smooth. • Moisturizes and exfoliates dead skin cells, creamy and easy to apply = reduces hair growth. The beauty of scent, softness, and hydration.}   ,                                                                                                                                                                                                                   "},
+    {id : 3 , name : 'body lotion' , price : 250  , image :"photo_2025-12-14_16-54-49.jpg",desc:"125 ml Price 250 Body Lotion Derma Care is your perfect companion, combining the scent of strawberry and rose vanilla. Ingredients: Shea butter, coconut butter, jojoba oil, grape seed oil, coconut oil, sweet almond oil, saffron oil, panthenol, glycerin, urea, salicylic acid, niacinamide, vitamin E.                                                                                                                                                                                                                                                                                                                       "},
+    {id : 4 , name : 'سدر مطحون نقي' , price : 180  , image :"photo_2025-12-14_16-48-51.jpg",desc:"                                                                                                                                                                                                                                                                                                                       "},
+    {id : 5 , name : 'Body butter' , price : 120  , image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering                                                                                                              "},
+    {id : 6 , name : 'Tint Creamy' , price : 120  , image :"photo_2025-12-14_16-49-41.jpg",desc:"                                                                                                                                                                                                                                                                                                                       "},
+    {id : 7 , name : 'Body butter' , price : 200, image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering.                                                                                                                                                                                    "},
+     ]
+    const url =new URLSearchParams(window.location.search)
+    const proid = parseInt(url.get("id"))
+    const prodact = prodacts.find(p => p.id ===proid)
+
+
+    const cont = document.getElementById('prodactdetalis')
+    
+    cont.innerHTML+= `
+ 
+    <img  src="${prodact.image}">
+    <div class="info">
+    <h3 >${prodact.name}</h3>
+    <div class="desc">${prodact.desc}</div>
+    <div class="price">$${prodact.price}</div>
+    <button class="btn" onclick="addToCart(${prodact.id})">Add to Cart</button>
+    </div>
+    `;
+    function getcart (){
+    const data = localStorage.getItem("cart")
+    if  (!data) return[]  
+    const parse = JSON.parse(data)
+    if (!Array.isArray(parse)){
+        localStorage.removeItem("cart")
+        return[]
+    } 
+    return  parse 
+    
+    }
+
+    function savecart(cart){
+    localStorage.setItem("cart",JSON.stringify(cart))
+    }
+        // let cart=[];
+    function addToCart(id){
+        const p = prodacts.find((p) => p.id === id)
+        let cart  = getcart()
+        cart.push(p);
+        savecart(cart);
+        updateCart();
+        openCart();
+    } 
+    function updateCart(){
+    const list =document.getElementById("cartItems")
+    list.innerHTML = "";
+    const cart = getcart();
+    cart.forEach((cartItem) => {
+    list.innerHTML += `
+    <div class="item">
+    <span>${cartItem.name}</span>
+    <span>${cartItem.price}</span>
+    </div>
+    <hr>
+     `
+    })}
+    function openCart(){
+        document.getElementById("cart").classList.add("open")
+    }
+    function closecart(){
+        document.getElementById("cart").classList.remove("open")
+
+    }
+    updateCart()
+    function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("active");
+}
+    </script>
+ 
+
+        <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p>All Rights Reserved</p>
+    </footer>
+</body>
+</html>

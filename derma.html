@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="derma.css">
+</head>
+<body>
+
+    <nav>
+
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+
+        <li><a href="#">Home</a></li>
+        <li><a href="about.html">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="contant.html">Contact</a></li>
+        
+    </ul>
+
+    </nav>
+    <div class="header">
+    <h1>Welcome To Derma Care</h1>
+    <p>Beauty Care</p>
+
+    </div>
+        <!-- <header>Derma Care</header> 
+    <div class="content">
+    <div class="card">
+    <img src="photo_2025-11-20_17-58-25.jpg" alt="img">
+    <h3>Body lotion</h3>
+    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Molestiae?</p>
+    <div class="price">
+        259$
+    </div>
+    <button class="btn">buy now</button>
+    </div>
+         -->
+
+
+   
+       <div class="content" id="contaner">
+
+    </div>
+   
+   
+   
+    </div>
+    
+    <script>
+    const contants = [
+    {id : 1 , name : 'lip balm' , price : 80  , image :"photo_2025-12-14_16-54-57.jpg"},
+    {id : 2 , name : 'Savings Package' , price : 350   , image :"photo_2025-12-14_16-51-26.jpg"},
+    {id : 3 , name : 'body lotion' , price : 250  , image :"photo_2025-12-14_16-54-49.jpg"},
+    {id : 4 , name : 'سدر مطحون نقي' , price : 180  , image :"photo_2025-12-14_16-48-51.jpg"},
+    {id : 5 , name : 'Body butter' , price : 120 , image :"photo_2025-12-14_16-50-56.jpg"},
+    {id : 6 , name : 'Tint Creamy' , price : 120  , image :"photo_2025-12-14_16-49-41.jpg"},
+    {id : 7 , name : 'Body butter' , price : 200 , image :"photo_2025-12-14_16-50-56.jpg"},
+    
+
+
+    
+     ]
+    
+    const contant = document.getElementById('contaner')
+    contants.forEach(content=> {
+    contant.innerHTML+= `
+    <div class="card">
+    <img  src="${content.image}"onclick="goToprodact(${content.id})">
+    <h3 onclick="goToprodact(${content.id})">${content.name}</h3>
+    <div class="price">$${content.price}</div>
+    <button class="btn" onclick="goToprodact(${content.id})">view product</button>
+    </div>
+    `;
+    });
+        function goToprodact(id){
+    window.location.href = `image.html?id=${id}`
+    }
+    function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("active");
+}
+    </script>
+    <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p>All Rights Reserved</p>
+    </footer>
+</body>
+</html>

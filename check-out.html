@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="derma.css">
+</head>
+<body>
+        <nav>
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+
+        <li><a href="derma.html">Home</a></li>
+        <li><a href="#">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="contant.html">Contact</a></li>
+        
+    </ul>
+    </nav>
+    <div class="check_out">
+    <div class="summary">
+    <h2>your order</h2>
+      <div id="cartiitems">
+    </div>
+    <div class="total" id="total-price">
+
+    </div>
+
+    </div>
+  
+    <div class="summary">
+    <p>SHIPPING DETAILS</p>
+    
+    
+
+    <input type="text" placeholder="Enter Your Name">
+    
+    <input type="email" placeholder="Enter Your Email">
+    
+    <input type="number" placeholder="Phone number">
+
+    <textarea  placeholder="Write Your Shipping Adress"></textarea>
+    <select>
+    <option value="">vodafone cash => 01030006247</option> 
+    <option value="">insta pay => 01030006247</option>
+    </select>
+    <button onclick="placeorder()">place order</button>
+    </div>
+    </div>
+
+   
+    
+        <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p>All Rights Reserved</p>
+    </footer>
+
+
+    <script>
+    const cart = JSON.parse(localStorage.getItem("cart"))||[]
+    const cartiitem = document.getElementById("cartiitems")
+    const total_pric = document.getElementById("total-price")
+    let total = 0
+    if (cart.length===0){
+    cartiitem.innerHTML = "<p>cart is empty</p>"
+     
+    }
+    else {
+        cart.forEach((item) => {
+    total+=item.price
+    cartiitem.innerHTML += `
+    <div class="cart-item">
+    <span>${item.name}</span>
+    <span>${item.price}</span>
+    </div>
+    <hr>
+     `
+    })
+    }
+    total_pric.innerText = " total : " + total
+    
+    function updateCart(){
+      const cartiitems = document.getElementById("cartiitems")
+      cartiitems.innerHTML=""
+    }
+
+
+
+    function placeorder() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  let message = "🛍️ *New Order*\n\n";
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    message += `${index + 1}. ${item.name} - $${item.price}\n`;
+    total += item.price;
+  });
+
+  message += `\n🧾 *Order Summary*`;
+  message += `\n💰 *Total:* $${total}`;
+  message += `\n📍 Please confirm this order`;
+
+  const phoneNumber = "201030006247"; // PUT YOUR WHATSAPP NUMBER
+  const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappURL, "_blank");
+  localStorage.removeItem("cart")
+  updateCart()
+  goToderma()
+}
+function goToderma(){
+    window.location.href = `derma.html`
+
+}
+
+function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("active");
+}
+    </script>
+</body>
+</html>

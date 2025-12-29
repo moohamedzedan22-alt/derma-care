@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="derma.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+     <nav>
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+
+        <li><a href="derma.html">Home</a></li>
+        <li><a href="about.html">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="#">Contact</a></li>
+        
+    </ul>
+    </nav>
+    <div class="container">
+    <h1>Contact Us</h1>
+    <div class="name">
+    <h2>phone number</h2>
+    <p>01030006247</p>
+    <h2>email</h2>
+    <p>monazedab261@gamil.com</p>
+    <a href="https://www.facebook.com/share/16Z89PqHax/"><i class="fa-brands fa-facebook" style="color: #ffa3e2;"></i></a>
+    <a href="https://www.instagram.com/derma__care5?igsh=MW1zdGhuZzkxMzJoeg=="><i class="fa-brands fa-instagram" style="color: #ffa3e2;"></i></a>
+    <a href="https://chat.whatsapp.com/GF2tFsJ3Jg23lK78W9O8IH?mode=wwt"><i class="fa-brands fa-whatsapp" style="color: #ffa3e2;"></i></a>
+    </div>
+    <form>
+    <label>your name</label>
+    <input type="text" placeholder="Enter Your Name">
+    <label>Your Email</label>
+    <input type="text" placeholder="Enter Your Email">
+    <label>Your Message</label>
+    <textarea id="textarea" placeholder="Write Your Message"></textarea>
+    <button class="click" onclick="placeorder()">Send Message</button>
+
+
+    </form>
+    </div>
+        <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p>All Rights Reserved</p>
+    </footer>
+
+    <script>
+        function placeorder() {
+        const textarea =document.getElementById("textarea").value.trim()
+   if (!textarea){
+    alert("please write message")
+    return
+   }
+
+  let message = "🛍️ *New Message*\n\n";
+  
+
+  message += `\n🧾 *message*`;
+  message += `\n💰 *your Message:* $${textarea}`;
+
+  const phoneNumber = "201030006247"; // PUT YOUR WHATSAPP NUMBER
+  const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappURL, "_blank");
+}
+
+function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("active");
+}
+
+
+
+    </script>
+
+</body>
+</html>
