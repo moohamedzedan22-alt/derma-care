@@ -35,9 +35,9 @@
     </div>
     <form>
     <label>your name</label>
-    <input type="text" placeholder="Enter Your Name">
+    <input id="name" type="text" placeholder="Enter Your Name">
     <label>Your Email</label>
-    <input type="text" placeholder="Enter Your Email">
+    <input id="email" type="text" placeholder="Enter Your Email">
     <label>Your Message</label>
     <textarea id="textarea" placeholder="Write Your Message"></textarea>
     <button class="click" onclick="placeorder()">Send Message</button>
@@ -54,15 +54,27 @@
     <script>
         function placeorder() {
         const textarea =document.getElementById("textarea").value.trim()
+        const name =document.getElementById("name").value.trim()
+        const email =document.getElementById("email").value.trim()
+
    if (!textarea){
     alert("please write message")
     return
    }
+    else if (!name){
+        alert("please Enter Your name !");
+    return;
+
+  }else if(!email){
+         alert("please Enter Your Email !");
+    return;}
 
   let message = "🛍️ *New Message*\n\n";
   
 
   message += `\n🧾 *message*`;
+    message +=`*Name*:${name}\n`
+  message +=`*Email*:${email}\n`
   message += `\n💰 *your Message:* $${textarea}`;
 
   const phoneNumber = "201030006247"; // PUT YOUR WHATSAPP NUMBER

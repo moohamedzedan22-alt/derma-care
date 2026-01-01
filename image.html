@@ -34,13 +34,13 @@
     </div>
  <script>
     const prodacts= [
-    {id : 1 , name : 'lip balm' , price : 80  , image :"photo_2025-12-14_16-54-57.jpg" ,desc:"With a strawberry scent… the secret to soft lips all day Shea butter: deep nourishment and instant softness Beeswax: locks in moisture and protects against cracking Jojoba oil, Castor oil, Grape seed oil, Vitamin E: keeps lips healthy and prevents dryness."},
-    {id : 2 , name : 'Savings Package' , price : 350   , image :"photo_2025-12-14_16-51-26.jpg",desc: "Winter has arrived... and your skin is calling for hydration. If you still dont have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care. The Complete Hydration Package = everything your body needs. Lip balm protects your lips from chapping and gives a natural rosy color. It’s rich in moisturizing oils, vitamin E, and shea butter for extra hydration. Body butter – any girl who loves the feeling of softness and hydration all over her body, this body butter is for you. Deep hydration, lasting all the time. Body lotion – treats goosebumps, helps renew the skin, and leaves it looking healthy and smooth. • Moisturizes and exfoliates dead skin cells, creamy and easy to apply = reduces hair growth. The beauty of scent, softness, and hydration.}   ,                                                                                                                                                                                                                   "},
+    {id : 1 , name : 'lip balm' , price : 80  , image :"photo_2025-12-14_16-54-57.jpg" ,desc:"With a strawberry scent… the secret to soft lips all day Shea butter: deep nourishment and instant softness Beeswax: locks in moisture and protects against cracking Jojoba oil, Castor oil, Grape seed oil, Vitamin E: keeps lips healthy and prevents dryness.",quantity:0},
+    {id : 2 , name : 'Savings Package' , price : 350   , image :"photo_2025-12-14_16-51-26.jpg",desc: "Winter has arrived... and your skin is calling for hydration. If you still dont have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care. The Complete Hydration Package = everything your body needs. Lip balm protects your lips from chapping and gives a natural rosy color. It’s rich in moisturizing oils, vitamin E, and shea butter for extra hydration. Body butter – any girl who loves the feeling of softness and hydration all over her body, this body butter is for you. Deep hydration, lasting all the time. Body lotion – treats goosebumps, helps renew the skin, and leaves it looking healthy and smooth. • Moisturizes and exfoliates dead skin cells, creamy and easy to apply = reduces hair growth. The beauty of scent, softness, and hydration.                                                                                                                                                                                                                   ",quantity:0},
     {id : 3 , name : 'body lotion' , price : 250  , image :"photo_2025-12-14_16-54-49.jpg",desc:"125 ml Price 250 Body Lotion Derma Care is your perfect companion, combining the scent of strawberry and rose vanilla. Ingredients: Shea butter, coconut butter, jojoba oil, grape seed oil, coconut oil, sweet almond oil, saffron oil, panthenol, glycerin, urea, salicylic acid, niacinamide, vitamin E.                                                                                                                                                                                                                                                                                                                       "},
-    {id : 4 , name : 'سدر مطحون نقي' , price : 180  , image :"photo_2025-12-14_16-48-51.jpg",desc:"                                                                                                                                                                                                                                                                                                                       "},
-    {id : 5 , name : 'Body butter' , price : 120  , image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering                                                                                                              "},
-    {id : 6 , name : 'Tint Creamy' , price : 120  , image :"photo_2025-12-14_16-49-41.jpg",desc:"                                                                                                                                                                                                                                                                                                                       "},
-    {id : 7 , name : 'Body butter' , price : 200, image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering.                                                                                                                                                                                    "},
+    {id : 4 , name : 'سدر مطحون نقي' , price : 180  , image :"photo_2025-12-14_16-48-51.jpg",desc:"                                                                                                                                                                                                                                                                                                                       ",quantity:0},
+    {id : 5 , name : 'Body butter' , price : 120  , image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering                                                                                                              ",quantity:0},
+    {id : 6 , name : 'Tint Creamy' , price : 120  , image :"photo_2025-12-14_16-49-41.jpg",desc:"                                                                                                                                                                                                                                                                                                                       ",quantity:0},
+    {id : 7 , name : 'Body butter' , price : 200, image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering.                                                                                                                                                                                    ",quantity:0},
      ]
     const url =new URLSearchParams(window.location.search)
     const proid = parseInt(url.get("id"))
@@ -55,7 +55,7 @@
     <div class="info">
     <h3 >${prodact.name}</h3>
     <div class="desc">${prodact.desc}</div>
-    <div class="price">$${prodact.price}</div>
+    <div class="price">${prodact.price}L.E</div>
     <button class="btn" onclick="addToCart(${prodact.id})">Add to Cart</button>
     </div>
     `;
@@ -78,7 +78,16 @@
     function addToCart(id){
         const p = prodacts.find((p) => p.id === id)
         let cart  = getcart()
-        cart.push(p);
+        const existitem = cart.find( item => item.id === id)
+        if(existitem){
+        existitem.quantity+=1
+        }else{
+         cart.push({
+        ...prodact,quantity:1          
+         })
+
+        }
+        // cart.push(p);
         savecart(cart);
         updateCart();
         openCart();
@@ -87,14 +96,23 @@
     const list =document.getElementById("cartItems")
     list.innerHTML = "";
     const cart = getcart();
-    cart.forEach((cartItem) => {
+cart.forEach((item, index) => {
     list.innerHTML += `
-    <div class="item">
-    <span>${cartItem.name}</span>
-    <span>${cartItem.price}</span>
-    </div>
-    <hr>
-     `
+      <div class="item">
+        <span>${item.name}</span>
+
+        <div class="qty-controls">
+          <button onclick="changeQty(${index}, -1)">➖</button>
+          <span>${item.quantity}</span>
+          <button onclick="changeQty(${index}, 1)">➕</button>
+        </div>
+
+        <span>${item.price * item.quantity} L.E</span>
+
+        <button class="delete-btn" onclick="removeItem(${index})">🗑️</button>
+      </div>
+      <hr>
+    `
     })}
     function openCart(){
         document.getElementById("cart").classList.add("open")
@@ -106,7 +124,22 @@
     updateCart()
     function toggleMenu() {
     document.getElementById("navMenu").classList.toggle("active");
-}
+    }
+    function changeQty(index,change){
+    let cart = getcart()
+    cart[index].quantity+=change
+    if(cart[index].quantity<=0){
+     cart.splice(index,1)
+    }
+    savecart(cart)
+    updateCart()
+    }
+    function removeItem(index){
+    let cart = getcart()
+    cart.splice(index,1)
+    savecart(cart)
+    updateCart()
+    }
     </script>
  
 

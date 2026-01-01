@@ -37,13 +37,10 @@
     
     
 
-    <input type="text" placeholder="Enter Your Name">
-    
-    <input type="email" placeholder="Enter Your Email">
-    
-    <input type="number" placeholder="Phone number">
+    <input id="name" type="text" placeholder="Enter Your Name">
+    <input id="phone" type="number" placeholder="Phone number">
 
-    <textarea  placeholder="Write Your Shipping Adress"></textarea>
+    <textarea id="adress" placeholder="Write Your Shipping Adress"></textarea>
     <select>
     <option value="">vodafone cash => 01030006247</option> 
     <option value="">insta pay => 01030006247</option>
@@ -71,12 +68,14 @@
      
     }
     else {
+        
         cart.forEach((item) => {
-    total+=item.price
+    const itemtotal = item.price*item.quantity
+    total+=itemtotal
     cartiitem.innerHTML += `
     <div class="cart-item">
-    <span>${item.name}</span>
-    <span>${item.price}</span>
+    <span>${item.name}  X${item.quantity}</span>
+    <span>${itemtotal}L.E</span>
     </div>
     <hr>
      `
@@ -94,17 +93,39 @@
     function placeorder() {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+  const name = document.getElementById("name").value.trim()
+  const phone = document.getElementById("phone").value.trim()
+  const adress = document.getElementById("adress").value.trim()
+  
+
+
   if (cart.length === 0) {
     alert("Your cart is empty!");
     return;
   }
+  if (!name){
+        alert("please Enter Your name !");
+    return;
 
+  }else if(!phone){
+         alert("please Enter Your phone !");
+    return;
+  }else if (!adress) {
+          alert("please Enter Your address !");
+    return;
+  }
   let message = "🛍️ *New Order*\n\n";
+  message +=`*Name*:${name}\n`
+  message +=`*Phone*:${phone}\n`
+  message +=`*Address*:${adress}\n`
+  message +=`*Order Details*:`
+
   let total = 0;
 
   cart.forEach((item, index) => {
-    message += `${index + 1}. ${item.name} - $${item.price}\n`;
-    total += item.price;
+    const itemtotal = item.price*item.quantity
+    message += `${index + 1}. ${item.name}  X${item.quantity} - $${itemtotal}\n`;
+    total += itemtotal;
   });
 
   message += `\n🧾 *Order Summary*`;
