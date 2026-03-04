@@ -3,150 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Product Details - Derma Care</title>
     <link rel="stylesheet" href="derma.css">
 </head>
 <body>
-         <nav>
+    <nav>
     <div class="logo">Derma Care</div>
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
     <ul id="navMenu">
         <li class="close-btn" onclick="toggleMenu()">✖</li>
-
         <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About As</a></li>
         <li><a href="prodact.html">Prodacts</a></li>
         <li><a href="contant.html">Contact</a></li>
-        
     </ul>
     </nav>
 
+    <script>
+    document.write('<button id="langBtn" onclick="toggleLang()" style="position:fixed;top:80px;right:20px;z-index:1001;padding:10px 20px;background:white;border:2px solid rgb(235, 65, 121);border-radius:20px;cursor:pointer;font-weight:bold;color:rgb(235, 65, 121)">العربية</button>');
+
+    function toggleLang() {
+        var lang = localStorage.getItem("lang") || "en";
+        var newLang = lang === "en" ? "ar" : "en";
+        localStorage.setItem("lang", newLang);
+        document.body.dir = newLang === "ar" ? "rtl" : "ltr";
+        document.getElementById("langBtn").textContent = newLang === "en" ? "العربية" : "English";
+        renderProduct();
+        updateContent();
+    }
+    
+    function updateContent() {
+        var lang = localStorage.getItem("lang") || "en";
+        var navLinks = document.querySelectorAll("#navMenu li a");
+        if (navLinks[0]) navLinks[0].textContent = lang === "ar" ? "الرئيسية" : "Home";
+        if (navLinks[1]) navLinks[1].textContent = lang === "ar" ? "عن الشركة" : "About As";
+        if (navLinks[2]) navLinks[2].textContent = lang === "ar" ? "المنتجات" : "Prodacts";
+        if (navLinks[3]) navLinks[3].textContent = lang === "ar" ? "اتصل بنا" : "Contact";
+        
+        var footerText = document.getElementById("footerText");
+        if (footerText) footerText.textContent = lang === "ar" ? "جميع الحقوق محفوظة" : "All Rights Reserved";
+    }
+    </script>
+
     <div class="details" id="prodactdetalis"></div>
     <div class="carts" id="cart">
-    <div class="cart_header">
-    YOUR CART
-   <span class="close-cart" onclick="closecart()">x</span>
-
-    </div>
+    <div class="cart_header">YOUR CART <span class="close-cart" onclick="closecart()">x</span></div>
     <div class="cartitem" id="cartItems"></div>
     <button onclick="window.location.href='check-out.html'" class="checkout-btn">check out</button>
     </div>
- <script>
-    const prodacts= [
-    {id : 1 , name : 'lip balm' , price : 80  , image :"photo_2025-12-14_16-54-57.jpg" ,desc:"With a strawberry scent… the secret to soft lips all day Shea butter: deep nourishment and instant softness Beeswax: locks in moisture and protects against cracking Jojoba oil, Castor oil, Grape seed oil, Vitamin E: keeps lips healthy and prevents dryness.",quantity:0},
-    {id : 2 , name : 'Savings Package' , price : 350   , image :"photo_2025-12-14_16-51-26.jpg",desc: "Winter has arrived... and your skin is calling for hydration. If you still dont have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care. The Complete Hydration Package = everything your body needs. Lip balm protects your lips from chapping and gives a natural rosy color. It’s rich in moisturizing oils, vitamin E, and shea butter for extra hydration. Body butter – any girl who loves the feeling of softness and hydration all over her body, this body butter is for you. Deep hydration, lasting all the time. Body lotion – treats goosebumps, helps renew the skin, and leaves it looking healthy and smooth. • Moisturizes and exfoliates dead skin cells, creamy and easy to apply = reduces hair growth. The beauty of scent, softness, and hydration.                                                                                                                                                                                                                   ",quantity:0},
-    {id : 3 , name : 'body lotion' , price : 250  , image :"photo_2025-12-14_16-54-49.jpg",desc:"125 ml Price 250 Body Lotion Derma Care is your perfect companion, combining the scent of strawberry and rose vanilla. Ingredients: Shea butter, coconut butter, jojoba oil, grape seed oil, coconut oil, sweet almond oil, saffron oil, panthenol, glycerin, urea, salicylic acid, niacinamide, vitamin E.                                                                                                                                                                                                                                                                                                                       "},
-    {id : 4 , name : 'سدر مطحون نقي' , price : 180  , image :"photo_2025-12-14_16-48-51.jpg",desc:"                                                                                                                                                                                                                                                                                                                       ",quantity:0},
-    {id : 5 , name : 'Body butter' , price : 120  , image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering                                                                                                              ",quantity:0},
-    {id : 6 , name : 'Tint Creamy' , price : 120  , image :"photo_2025-12-14_16-49-41.jpg",desc:"                                                                                                                                                                                                                                                                                                                       ",quantity:0},
-    {id : 7 , name : 'Body butter' , price : 200, image :"photo_2025-12-14_16-50-56.jpg",desc:" Body butter is available in two sizes: 50g Price 120, 100g Price 200. Ingredients include shea butter and coconut butter with strawberry and rose vanilla scent and extract. Its ingredients include shea butter, coconut butter, sweet almond oil, jojoba oil, coconut oil, grape seed oil, panthenol, glycerin, urea, niacinamide, and vitamin E. It is recommended to use moisturizers and butters regularly for the skin, especially in winter, after showering.                                                                                                                                                                                    ",quantity:0},
-     ]
-    const url =new URLSearchParams(window.location.search)
-    const proid = parseInt(url.get("id"))
-    const prodact = prodacts.find(p => p.id ===proid)
-
-
-    const cont = document.getElementById('prodactdetalis')
     
-    cont.innerHTML+= `
- 
-    <img  src="${prodact.image}">
-    <div class="info">
-    <h3 >${prodact.name}</h3>
-    <div class="desc">${prodact.desc}</div>
-    <div class="price">${prodact.price}L.E</div>
-    <button class="btn" onclick="addToCart(${prodact.id})">Add to Cart</button>
-    </div>
-    `;
-    function getcart (){
-    const data = localStorage.getItem("cart")
-    if  (!data) return[]  
-    const parse = JSON.parse(data)
-    if (!Array.isArray(parse)){
-        localStorage.removeItem("cart")
-        return[]
-    } 
-    return  parse 
+    <script>
+    var prodacts = [
+    {id: 1, nameEn: "Lip Balm", nameAr: "ليپ بالم", price: 80, image: "photo_2025-12-14_16-54-57.jpg", descEn: "Lip balm 5ml - Derma Care with strawberry scent - the secret to soft lips all day. Shea butter: deep nourishment. Beeswax: locks moisture. Jojoba oil, Castor oil, Grape seed oil, Vitamin E: keeps lips healthy.", descAr: "✨ ليب بالم Derma Care برائحة الفرولة … سرّ الشفايف الناعمة طول اليوم. زبدة الشيا: تغذية عميقة ونعومة فورية. شمع العسل: يحبس الترطيب ويحمي من التشققات. زيت الجوجوبا. زيت الخروع. زيت بذور العنب. فيتامين E: يحافظ على حيوية الشفايف ويمنع الجفاف."},
+    {id: 2, nameEn: "Savings Package", nameAr: "الباقة الذهبية", price: 350, image: "photo_2025-12-14_16-51-26.jpg", descEn: "Winter is here and your skin is calling for hydration! If you don't have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care.", descAr: "شتا دخل... وجلدك بينادي على الترطيب ❄️ لو لسه معندكيش روتين ترطيب ينقذك من جفاف الشتا يبقى لازم تشوفي الباكيدج دي من Derma Care. 💗 باكيدج الترطيب الكامل = كل اللي جسمك محتاجه."},
+    {id: 3, nameEn: "Body Lotion", nameAr: "بادي لوشن", price: 250, image: "photo_2025-12-14_16-54-49.jpg", descEn: "125 ml - Body Lotion with strawberry and rose vanilla scent. Ingredients: Shea butter, Coconut butter, Jojoba oil, Grape seed oil, Sweet almond oil, Panthenol, Glycerin, Urea, Vitamin E.", descAr: "بادي لوشن ديرما كير هو رفيقك المثالي يجمع ما بين رائحة الفرولة والروز فانيلياً. المكونات: زبدة الشيا، زبدة جوز الهند، زيت الجوجوبا، زيت بذور العنب، زيت اللوز الحلو، بانثينول، جلسرين، يوريا، فيتامبن E."},
+    {id: 4, nameEn: "Pure Henna Powder", nameAr: "سدر مغربي", price: 180, image: "photo_2025-12-14_16-48-51.jpg", descEn: "Pure Moroccan Henna - The only product you'll need for your hair. 5 benefits in 1 box. Size: 200g.", descAr: "سبيلي كل حاجة في إيدك وعلبة السدر المغربي هتعمل إيه في حياتك💚. دي علبة فيها السدر المغربي الأصلي: 1. بيعالج تساقط الشعر. 2. اللمعان هيبقى عندك طول الوقت. 3. بيعالج فروة الشعر. 4. تنضيف عميق. 5. يقضي على القشرة. الحجم: 200 جرام."},
+    {id: 5, nameEn: "Body Butter", nameAr: "بادي باتر", price: 120, image: "photo_2025-12-14_16-50-56.jpg", descEn: "Body Butter - Available in two sizes: 50g (120 LE), 100g (200 LE). Ingredients: Shea butter, Coconut butter, Jojoba oil, Grape seed oil, Sweet almond oil, Panthenol, Glycerin, Urea, Niacinamide, Vitamin E.", descAr: "بادي باتر - متوفر حجمين: 50 جرام (120 LE)، 100 جرام (200 LE). مكونات: زبدة الشيا، زبدة جوز الهند، زيت اللوز الحلو، زيت جوجوبا، زيت بذور العنب، بانثينول، جلسرين، يوريا، نياسيناميد، فيتامبن E."},
+    {id: 6, nameEn: "Tint Creamy", nameAr: "تينت كريمي", price: 120, image: "photo_2025-12-14_16-49-41.jpg", descEn: "Tint Creamy - Easy to apply therapeutic tint rich with Niacinamide 2%, Jojoba oil, Sweet almond oil, Panthenol, Glycerin, Shea butter, Vitamin E. Also includes Lip Balm Therapy. Size: 10ml.", descAr: "تينت كريمي سهل الفرد علاجي غني بـ: نيسيناميد 2%، زيت الجوجوبا، زيت اللوز الحلو، بانثينول، جلسرين، زبدة الشيا، فيتامبن E. مع ليب بالم ثيربي. الحجم: 10 مل."},
+    {id: 7, nameEn: "Body Butter Large", nameAr: "بادي باتر كبير", price: 200, image: "photo_2025-12-14_16-50-56.jpg", descEn: "Body Butter 100g - Deep hydration for all body. Recommended to use after showering in winter.", descAr: "بادي باتر 100 جرام - ترطيب عميق لجميع الجسم. يُنصح باستخدامه بعد الاستحمام في الشتاء."},
+    {id: 8, nameEn: "Lip Gloss", nameAr: "ليب جلوس", price: 100, image: "WhatsApp Image 2026-03-03 at 11.34.44 PM.jpeg", descEn: "Lip Gloss - Competes with the best brands! Therapeutic lip gloss rich with Grape seed oil, Jojoba, Sweet almond oil and Vitamin E. Lightweight formula with only color shine. Strawberry scent. Limited quantity!", descAr: "ليب جلوس تنافس أجمد براند 🤏💗. ليب جلوس علاجية غنية بزيت بذور العنب والجوجوبا واللوز الحلو وفيتامبن E ترطيب مافيش أكتر من كدا مع لمعة شفايف سحرية. قوامها مش تقيل خالص بتعطي بس لمعة اللون. بريحة الفراولة🍓. المتاح كمية صغيره خالص جدا فالحقواها."},
+    {id: 9, nameEn: "Moroccan Soap", nameAr: "صابون مغربي", price: 180, image: "WhatsApp Image 2026-03-03 at 11.33.47 PM.jpeg", descEn: "Moroccan Soap with Argan Oil - Argan oil is known for its strong hydration and nourishment. The Moroccan glove helps exfoliate gently and effectively, leaving skin softer and smoother from the first use.", descAr: "الصابون المغربي بزيت الأرجان - زيت الأرجان معروف بترطيبه القوي وتغذيته للبشرة، فبيخلي الجلد ناعم ومرطب من غير جفاف، وكمان بيساعد في تحسين مظهر التصبغات. التبريمة: بتفتح المسام وبتجهز البشرة إنها تتنضف بعمق. الليفة المغربي: هي السر في النتيجة! بتقشر بلطف لكن بفاعلية، وبتسيب الجسم أنعم وأنضف بفرق واضح من أول مرة."},
+    {id: 10, nameEn: "Foot Care Set", nameAr: "مجموعة العناية بالقدمين", price: 180, image: "WhatsApp Image 2026-03-03 at 11.36.34 PM.jpeg", descEn: "Winter is here and your feet need care! Silicon Gel Sock with Vitamin E + VIP Foot File. - Protects feet from cracks. - Keeps feet moisturized. - Helps soften and brighten feet. VIP Foot File: - Removes dead skin easily. - Instant smooth texture. - Made of high quality materials.", descAr: "دخله الشتا وجفاف الرجلين 🐇🧦. عشان كدا قولنا نقدم منتجين مهمين لهوانم ديرما كير 💗💗. شراب سيلكون چيل بفيتامبن E: ملمس چيلاتيني أملس وطري وناعم جدا غني بزيت الجوجوبا، زيت الزيتون، فيتامبن E. - يحمي القدمين من التشققات. - يحافظ على رطوبه القدمين. - يساعد على تنعيم وتفتيح القدمين. مبرد القدمين ال VIP 🌿: - يزيل الجلد الميت والخشونة والتشققات من الكعبين والقدمين بسهولة. - ملمس ناعم فوري. - مكون من خامات عالية الجودة. الاتنين سوا بأقل من ١٨٠ جنية 💗💗😍"}
+    ];
     
+    function getProductName(product) {
+        var lang = localStorage.getItem("lang") || "en";
+        return lang === "ar" ? product.nameAr : product.nameEn;
+    }
+    
+    function getProductDesc(product) {
+        var lang = localStorage.getItem("lang") || "en";
+        return lang === "ar" ? product.descAr : product.descEn;
+    }
+    
+    function renderProduct() {
+        var url = new URLSearchParams(window.location.search);
+        var proid = parseInt(url.get("id"));
+        var prodact = prodacts.find(function(p) { return p.id === proid; });
+        
+        var cont = document.getElementById("prodactdetalis");
+        var btnText = localStorage.getItem("lang") === "ar" ? "أضف للسلة" : "Add to Cart";
+        var cartText = localStorage.getItem("lang") === "ar" ? "سلتك" : "YOUR CART";
+        var checkoutText = localStorage.getItem("lang") === "ar" ? "الدفع" : "check out";
+        
+        cont.innerHTML = "<img src='" + prodact.image + "'><div class='info'><h3>" + getProductName(prodact) + "</h3><div class='desc'>" + getProductDesc(prodact).replace(/\n/g, '<br>') + "</div><div class='price'>" + prodact.price + " LE</div><button class='btn' onclick='addToCart(" + prodact.id + ")'>" + btnText + "</button></div>";
+        
+        var cartHeader = document.querySelector(".cart_header");
+        if (cartHeader) { cartHeader.innerHTML = cartText + ' <span class="close-cart" onclick="closecart()">x</span>'; }
+        
+        var checkoutBtn = document.querySelector(".checkout-btn");
+        if (checkoutBtn) { checkoutBtn.textContent = checkoutText; }
+    }
+    
+    function getcart() {
+        var data = localStorage.getItem("cart");
+        if (!data) return [];
+        var parse = JSON.parse(data);
+        if (!Array.isArray(parse)) { localStorage.removeItem("cart"); return []; }
+        return parse;
     }
 
-    function savecart(cart){
-    localStorage.setItem("cart",JSON.stringify(cart))
-    }
-        // let cart=[];
-    function addToCart(id){
-        const p = prodacts.find((p) => p.id === id)
-        let cart  = getcart()
-        const existitem = cart.find( item => item.id === id)
-        if(existitem){
-        existitem.quantity+=1
-        }else{
-         cart.push({
-        ...prodact,quantity:1          
-         })
+    function savecart(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
 
+    function addToCart(id) {
+        var p = prodacts.find(function(prod) { return prod.id === id; });
+        var cart = getcart();
+        var existitem = cart.find(function(item) { return item.id === id; });
+        if (existitem) {
+            existitem.quantity += 1;
+        } else {
+            cart.push({
+                id: p.id,
+                name: getProductName(p),
+                price: p.price,
+                image: p.image,
+                quantity: 1
+            });
         }
-        // cart.push(p);
         savecart(cart);
         updateCart();
         openCart();
-    } 
-    function updateCart(){
-    const list =document.getElementById("cartItems")
-    list.innerHTML = "";
-    const cart = getcart();
-cart.forEach((item, index) => {
-    list.innerHTML += `
-      <div class="item">
-        <span>${item.name}</span>
-
-        <div class="qty-controls">
-          <button onclick="changeQty(${index}, -1)">➖</button>
-          <span>${item.quantity}</span>
-          <button onclick="changeQty(${index}, 1)">➕</button>
-        </div>
-
-        <span>${item.price * item.quantity} L.E</span>
-
-        <button class="delete-btn" onclick="removeItem(${index})">🗑️</button>
-      </div>
-      <hr>
-    `
-    })}
-    function openCart(){
-        document.getElementById("cart").classList.add("open")
     }
-    function closecart(){
-        document.getElementById("cart").classList.remove("open")
-
+    
+    function updateCart() {
+        var list = document.getElementById("cartItems");
+        list.innerHTML = "";
+        var cart = getcart();
+        
+        cart.forEach(function(item, index) {
+            list.innerHTML += "<div class='item'><span>" + item.name + "</span><div class='qty-controls'><button onclick='changeQty(" + index + ", -1)'>➖</button><span>" + item.quantity + "</span><button onclick='changeQty(" + index + ", 1)'>➕</button></div><span>" + (item.price * item.quantity) + " LE</span><button class='delete-btn' onclick='removeItem(" + index + ")'>🗑️</button></div><hr>";
+        });
     }
-    updateCart()
-    function toggleMenu() {
-    document.getElementById("navMenu").classList.toggle("active");
+    
+    function changeQty(index, change) {
+        var cart = getcart();
+        cart[index].quantity += change;
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        savecart(cart);
+        updateCart();
     }
-    function changeQty(index,change){
-    let cart = getcart()
-    cart[index].quantity+=change
-    if(cart[index].quantity<=0){
-     cart.splice(index,1)
+    
+    function removeItem(index) {
+        var cart = getcart();
+        cart.splice(index, 1);
+        savecart(cart);
+        updateCart();
     }
-    savecart(cart)
-    updateCart()
-    }
-    function removeItem(index){
-    let cart = getcart()
-    cart.splice(index,1)
-    savecart(cart)
-    updateCart()
-    }
+    
+    function openCart() { document.getElementById("cart").classList.add("open"); }
+    function closecart() { document.getElementById("cart").classList.remove("open"); }
+    function toggleMenu() { document.getElementById("navMenu").classList.toggle("active"); }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var savedLang = localStorage.getItem("lang");
+        if (savedLang) {
+            document.body.dir = savedLang === "ar" ? "rtl" : "ltr";
+            document.getElementById("langBtn").textContent = savedLang === "en" ? "العربية" : "English";
+        }
+        renderProduct();
+        updateCart();
+        updateContent();
+    });
     </script>
- 
 
-        <footer>
+    <footer>
      <p>01030006247</p>
      <p>Derma Care</p>
-     <p>All Rights Reserved</p>
+     <p id="footerText">All Rights Reserved</p>
     </footer>
 </body>
 </html>
