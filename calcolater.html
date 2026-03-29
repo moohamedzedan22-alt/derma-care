@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+
+<style>
+body{
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background:#222;
+}
+
+.calculator{
+    width: 320px;
+    padding: 20px;
+    background: black;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+.screen{
+    height: 60px;
+    background: white;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 26px;
+    text-align: right;
+    overflow: hidden;
+}
+
+.buttons{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+}
+
+button{
+    padding: 15px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.num{ background: #eee; }
+.op{ background: orange; color: white; }
+.equal{ background: green; color: white; grid-column: span 2; }
+.clear{ background: red; color: white; }
+.back{ background: #555; color: white; }
+</style>
+</head>
+
+<body>
+<div class="calculator">
+    <div id="screen" class="screen">0</div>
+
+    <div class="buttons">
+        <button class="clear" onclick="clearAll()">C</button>
+        <button class="back" onclick="backspace()">⌫</button>
+        <button class="op" onclick="addPercent()">%</button>
+        <button class="op" onclick="addOp('/')">÷</button>
+
+        <button class="op" onclick="addSqrt()">√</button>
+        <button class="op" onclick="addOp('**')">x<sup>y</sup></button>
+        <button class="op" onclick="addParen('(')">(</button>
+        <button class="op" onclick="addParen(')')">)</button>
+
+        <button class="num" onclick="addNum('7')">7</button>
+        <button class="num" onclick="addNum('8')">8</button>
+        <button class="num" onclick="addNum('9')">9</button>
+        <button class="op" onclick="addOp('*')">×</button>
+
+        <button class="num" onclick="addNum('4')">4</button>
+        <button class="num" onclick="addNum('5')">5</button>
+        <button class="num" onclick="addNum('6')">6</button>
+        <button class="op" onclick="addOp('-')">−</button>
+
+        <button class="num" onclick="addNum('1')">1</button>
+        <button class="num" onclick="addNum('2')">2</button>
+        <button class="num" onclick="addNum('3')">3</button>
+        <button class="op" onclick="addOp('+')">+</button>
+
+        <button class="op" onclick="toggleSign()">±</button>
+        <button class="num" onclick="addNum('0')">0</button>
+        <button class="num" onclick="addNum('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+let screen = document.getElementById("screen");
+let expression = "";
+
+function update(){
+    screen.innerText = expression || "0";
+}
+
+function addNum(num){
+    expression += num;
+    update();
+}
+
+function addOp(op){
+    if(expression === "") return;
+    let last = expression.slice(-1);
+    if("+-*/".includes(last)) return;
+    expression += op;
+    update();
+}
+
+function clearAll(){
+    expression = "";
+    update();
+}
+
+function backspace(){
+    expression = expression.slice(0, -1);
+    update();
+}
+
+function calculate(){
+    try{
+        expression = Function("return " + expression)().toString();
+        update();
+    }catch{
+        expression = "";
+        screen.innerText = "Error";
+    }
+}
+
+
+
+function addSqrt(){
+    expression += "Math.sqrt(";
+    update();
+}
+
+function addPercent(){
+    expression += "/100";
+    update();
+}
+
+function addParen(p){
+    expression += p;
+    update();
+}
+
+function toggleSign(){
+    if(expression === "") return;
+    expression = "(-" + expression + ")";
+    update();
+}
+</script>
+</body>
+</html>

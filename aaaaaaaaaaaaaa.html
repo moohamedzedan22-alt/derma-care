@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<link rel="stylesheet" href="aaaaaaaaaaaaaa.css">
+<style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+
+}
+.app{
+    box-shadow:0px 4px 15px  rgb(0, 0, 0) ;
+    background-color:#2f2f4f;
+    border-radius: 25px;
+    width: 450px;
+    padding: 25px;
+   
+}
+.app h1{
+    font-size: 25px;
+    color: white;
+    margin-bottom: 25px;
+    margin-left: 100px;
+}
+input{
+ border-radius: 10px;
+ padding: 7px;  
+ margin-bottom: 13px; 
+ width: 100%;
+}
+select{
+ border-radius: 10px;
+ padding: 7px;  
+ margin-bottom: 13px; 
+ width: 100%;
+}
+button{
+ border-radius: 10px;
+ padding: 12px;  
+ margin-bottom: 13px; 
+ width: 100%;
+ background-color: orange;
+ transition: 0.9s;
+}
+button:hover{
+    background-color: rgb(255, 88, 27);
+  transform: translateY(-5px);
+
+}
+#receipt{
+  background:#3a3a5f;
+  color:white;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:15px;
+  min-height:40px;
+}
+#orders{
+  background:#3a3a5f;
+  color:white;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:15px;
+  min-height:40px;
+}
+</style>
+
+</head>
+<body>
+    <div class="app">
+        <h1>🛺 Bill Split App</h1>
+        <input id="freindname" placeholder="Freind Name">
+        <select id="menu">
+            <option value="">Select Item</option>
+        </select>
+        <button onclick="addOrder()">Add Order</button>
+        <div id="orders"></div>
+        <button onclick="recipt()">Generate Receipt</button>
+        <div id="recepit"></div>
+    </div>
+<script>
+    const menuItems={
+        "🥤 Drink ": 20,
+        "🍔 Burger ":150,
+        "🍕 Pizza" :230,
+        "🥩 Steak " :400, 
+        "🍽 Pasta":140 ,
+        "☕ Coffe":25,
+    }
+    const ordres={}
+
+ const  menuu = document.getElementById("menu")
+ for(let item in menuItems ){
+   let opt=document.createElement("option")
+   opt.value=item
+   opt.textContent=item+" "+menuItems[item]+"L.E"
+   menuu.appendChild(opt)
+ }
+ function addOrder(){
+ const name=document.getElementById("freindname").value
+ const a=document.getElementById("menu").value
+ if (!name || !item)
+ return alert("Enter your Name OR Item")
+if (!ordres[name])ordres[name]=[]
+ordres[name].push(item)
+displayOrder()
+ }
+ function recipt(){
+
+ }
+</script>
+</body>
+</html>
