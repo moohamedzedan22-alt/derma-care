@@ -30,14 +30,20 @@ fi
 
 echo ""
 
-# Try to pull with allow-unrelated-histories flag
+# Pull with conflict resolution - keep local version
 echo "📥 Pulling latest changes from GitHub..."
-git pull origin main --allow-unrelated-histories
+git pull origin main --allow-unrelated-histories --no-commit
 
 if [ $? -eq 0 ]; then
-    echo "✅ Successfully pulled latest changes"
+    # If pull succeeded, commit it
+    echo "✅ Merged latest changes"
+    git commit -m "Merged remote changes" > /dev/null 2>&1
 else
-    echo "⚠️  Pull had issues - continuing with push..."
+    # If merge conflict, keep local version
+    echo "⚠️  Resolving conflicts - keeping local version..."
+    git checkout --ours .
+    git add .
+    git commit -m "Merged remote: kept local version"
 fi
 
 echo ""
@@ -48,8 +54,11 @@ git push -u origin master:main
 
 if [ $? -eq 0 ]; then
     echo "✅ Successfully pushed to GitHub!"
+    echo ""
+    echo "Your repository is now sync'd:"
+    echo "📍 GitHub: https://github.com/moohamedzedan22-alt/derma-care"
 else
-    echo "❌ Push failed - check your internet and GitHub credentials"
+    echo "❌ Push failed"
 fi
 
 echo ""
