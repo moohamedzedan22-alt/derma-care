@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Checkout - Derma Care</title>
     <link rel="stylesheet" href="derma.css">
 </head>
@@ -194,3 +195,153 @@
     </script>
 </body>
 </html>
+=======
+    <title>Document</title>
+    <link rel="stylesheet" href="derma.css">
+</head>
+<body>
+        <nav>
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="contant.html">Contact</a></li>
+        
+    </ul>
+    </nav>
+    <div class="check_out">
+    <div class="summary">
+    <h2>your order</h2>
+      <div id="cartiitems">
+    </div>
+    <div class="total" id="total-price">
+
+    </div>
+
+    </div>
+  
+    <div class="summary">
+    <p>SHIPPING DETAILS</p>
+    
+    
+
+    <input id="name" type="text" placeholder="Enter Your Name">
+    <input id="phone" type="number" placeholder="Phone number">
+
+    <textarea id="adress" placeholder="Write Your Shipping Adress"></textarea>
+    <select>
+    <option value="">vodafone cash => 01030006247</option> 
+    <option value="">insta pay => 01030006247</option>
+    </select>
+    <button onclick="placeorder()">place order</button>
+    </div>
+    </div>
+
+   
+    
+        <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p>All Rights Reserved</p>
+    </footer>
+
+
+    <script>
+    const cart = JSON.parse(localStorage.getItem("cart"))||[]
+    const cartiitem = document.getElementById("cartiitems")
+    const total_pric = document.getElementById("total-price")
+    let total = 0
+    if (cart.length===0){
+    cartiitem.innerHTML = "<p>cart is empty</p>"
+     
+    }
+    else {
+        
+        cart.forEach((item) => {
+    const itemtotal = item.price*item.quantity
+    total+=itemtotal
+    cartiitem.innerHTML += `
+    <div class="cart-item">
+    <span>${item.name}  X${item.quantity}</span>
+    <span>${itemtotal}L.E</span>
+    </div>
+    <hr>
+     `
+    })
+    }
+    total_pric.innerText = " total : " + total
+    
+    function updateCart(){
+      const cartiitems = document.getElementById("cartiitems")
+      cartiitems.innerHTML=""
+    }
+
+
+
+    function placeorder() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const name = document.getElementById("name").value.trim()
+  const phone = document.getElementById("phone").value.trim()
+  const adress = document.getElementById("adress").value.trim()
+  
+
+
+  if (cart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+  if (!name){
+        alert("please Enter Your name !");
+    return;
+
+  }else if(!phone){
+         alert("please Enter Your phone !");
+    return;
+  }else if (!adress) {
+          alert("please Enter Your address !");
+    return;
+  }
+  let message = "🛍️ *New Order*\n\n";
+  message +=`*Name*:${name}\n`
+  message +=`*Phone*:${phone}\n`
+  message +=`*Address*:${adress}\n`
+  message +=`*Order Details*:`
+
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    const itemtotal = item.price*item.quantity
+    message += `${index + 1}. ${item.name}  X${item.quantity} - $${itemtotal}\n`;
+    total += itemtotal;
+  });
+
+  message += `\n🧾 *Order Summary*`;
+  message += `\n💰 *Total:* $${total}`;
+  message += `\n📍 Please confirm this order`;
+
+  const phoneNumber = "201030006247"; // PUT YOUR WHATSAPP NUMBER
+  const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappURL, "_blank");
+  localStorage.removeItem("cart")
+  updateCart()
+  goToderma()
+}
+function goToderma(){
+    window.location.href = `index.html`
+
+}
+
+function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("active");
+}
+    </script>
+</body>
+</html>
+>>>>>>> 66233aa1ef7ebe13fcfa76198376e5eb062de3fe
