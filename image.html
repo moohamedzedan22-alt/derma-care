@@ -70,7 +70,7 @@
     
     function getProductName(product) {
         var lang = localStorage.getItem("lang") || "en";
-        return lang === "ar" ? product.nameAr : product.nameEn;
+        return (lang === "ar" ? product.nameAr : product.nameEn) || product.name;
     }
     
     function getProductDesc(product) {
@@ -115,7 +115,7 @@
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
-            cart.push({id: p.id, name: getProductName(p), price: p.price, quantity: 1});
+            cart.push({id: p.id, name: getProductName(p), nameEn: p.nameEn, nameAr: p.nameAr, price: p.price, quantity: 1});
         }
         
         savecart(cart);

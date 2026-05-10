@@ -121,10 +121,11 @@
                 var product = getProductById(item.id);
 
                 // IMPORTANT: prefer item.name (added by image.html) to avoid undefined
-                var name = item.name || (product && product.nameEn ? getProductName(product) : "");
+                var name = item.nameAr && lang === "ar" ? item.nameAr : (item.nameEn && lang === "en" ? item.nameEn : item.name) || (product && product.nameEn ? getProductName(product) : "");
+                var qty = item.quantity || 1;
 
-                total += item.price;
-                cartiitem.innerHTML += "<div class='cart-item'><span>" + name + "</span><span>" + item.price + " LE</span></div><hr>";
+                total += item.price * qty;
+                cartiitem.innerHTML += "<div class='cart-item'><span>" + name + " (x" + qty + ")</span><span>" + (item.price * qty) + " LE</span></div><hr>";
             });
         }
 
@@ -149,10 +150,11 @@
                 var product = getProductById(item.id);
 
                 // IMPORTANT: prefer item.name to avoid undefined
-                var name = item.name || (product && product.nameEn ? getProductName(product) : "");
+                var name = item.nameAr && lang === "ar" ? item.nameAr : (item.nameEn && lang === "en" ? item.nameEn : item.name) || (product && product.nameEn ? getProductName(product) : "");
+                var qty = item.quantity || 1;
 
-                message += (index + 1) + ". " + name + " - " + item.price + " LE\n";
-                total += item.price;
+                message += (index + 1) + ". " + name + " (x" + qty + ") - " + (item.price * qty) + " LE\n";
+                total += item.price * qty;
             });
             message += "\nملخص الطلب";
             message += "\nالإجمالي: " + total + " LE";
@@ -162,10 +164,11 @@
                 var product = getProductById(item.id);
 
                 // IMPORTANT: prefer item.name to avoid undefined
-                var name = item.name || (product && product.nameEn ? getProductName(product) : "");
+                var name = item.nameAr && lang === "ar" ? item.nameAr : (item.nameEn && lang === "en" ? item.nameEn : item.name) || (product && product.nameEn ? getProductName(product) : "");
+                var qty = item.quantity || 1;
 
-                message += (index + 1) + ". " + name + " - " + item.price + " LE\n";
-                total += item.price;
+                message += (index + 1) + ". " + name + " (x" + qty + ") - " + (item.price * qty) + " LE\n";
+                total += item.price * qty;
             });
             message += "\nOrder Summary";
             message += "\nTotal: " + total + " LE";
@@ -200,4 +203,3 @@
     </script>
 </body>
 </html>
-
