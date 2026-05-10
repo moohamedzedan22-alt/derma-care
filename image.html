@@ -12,7 +12,7 @@
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
     <ul id="navMenu">
         <li class="close-btn" onclick="toggleMenu()">✖</li>
-        <li><a href="index.html">Home</a></li>
+        <li><a href="derma.html">Home</a></li>
         <li><a href="about.html">About As</a></li>
         <li><a href="prodact.html">Prodacts</a></li>
         <li><a href="contant.html">Contact</a></li>
@@ -110,18 +110,14 @@
     function addToCart(id) {
         var p = prodacts.find(function(prod) { return prod.id === id; });
         var cart = getcart();
-        var existitem = cart.find(function(item) { return item.id === id; });
-        if (existitem) {
-            existitem.quantity += 1;
+        var existingItem = cart.find(function(item) { return item.id === id; });
+        
+        if (existingItem) {
+            existingItem.quantity += 1;
         } else {
-            cart.push({
-                id: p.id,
-                name: getProductName(p),
-                price: p.price,
-                image: p.image,
-                quantity: 1
-            });
+            cart.push({id: p.id, name: getProductName(p), price: p.price, quantity: 1});
         }
+        
         savecart(cart);
         updateCart();
         openCart();
@@ -131,9 +127,9 @@
         var list = document.getElementById("cartItems");
         list.innerHTML = "";
         var cart = getcart();
-        
+
         cart.forEach(function(item, index) {
-            list.innerHTML += "<div class='item'><span>" + item.name + "</span><div class='qty-controls'><button onclick='changeQty(" + index + ", -1)'>➖</button><span>" + item.quantity + "</span><button onclick='changeQty(" + index + ", 1)'>➕</button></div><span>" + (item.price * item.quantity) + " LE</span><button class='delete-btn' onclick='removeItem(" + index + ")'>🗑️</button></div><hr>";
+            list.innerHTML += "<div class='item'><span>" + getProductName(item) + "</span><div class='qty-controls'><button onclick='changeQty(" + index + ", -1)'>➖</button><span>" + item.quantity + "</span><button onclick='changeQty(" + index + ", 1)'>➕</button></div><span>" + (item.price * item.quantity) + " LE</span><button class='delete-btn' onclick='removeItem(" + index + ")'>🗑️</button></div><hr>";
         });
     }
     
@@ -153,7 +149,6 @@
         savecart(cart);
         updateCart();
     }
-    
     function openCart() { document.getElementById("cart").classList.add("open"); }
     function closecart() { document.getElementById("cart").classList.remove("open"); }
     function toggleMenu() { document.getElementById("navMenu").classList.toggle("active"); }

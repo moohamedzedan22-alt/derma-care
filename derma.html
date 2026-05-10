@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derma Care</title>
+    <link rel="stylesheet" href="derma.css">
+</head>
+<body>
+
+    <nav>
+    <div class="logo">Derma Care</div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navMenu">
+        <li class="close-btn" onclick="toggleMenu()">✖</li>
+        <li><a href="#">Home</a></li>
+        <li><a href="about.html">About As</a></li>
+        <li><a href="prodact.html">Prodacts</a></li>
+        <li><a href="contant.html">Contact</a></li>
+    </ul>
+    </nav>
+    
+    <div class="header">
+    <h1>Welcome To Derma Care</h1>
+    <p>Beauty Care</p>
+    </div>
+    
+    <div class="content" id="contaner"></div>
+    
+    <script>
+    document.write('<button id="langBtn" onclick="toggleLang()" style="position:fixed;top:80px;right:20px;z-index:1001;padding:10px 20px;background:white;border:2px solid rgb(235, 65, 121);border-radius:20px;cursor:pointer;font-weight:bold;color:rgb(235, 65, 121)">العربية</button>');
+
+    function toggleLang() {
+        var lang = localStorage.getItem("lang") || "en";
+        var newLang = lang === "en" ? "ar" : "en";
+        localStorage.setItem("lang", newLang);
+        document.body.dir = newLang === "ar" ? "rtl" : "ltr";
+        document.getElementById("langBtn").textContent = newLang === "en" ? "العربية" : "English";
+        renderProducts();
+        updateNavAndHeader();
+    }
+
+    var contants = [
+    {id: 1, nameEn: "Lip Balm", nameAr: "باليوم للشفاه", price: 80, image: "photo_2025-12-14_16-54-57.jpg", descEn: "With a strawberry scent - the secret to soft lips all day.", descAr: "برائحة الفراولة - سر الشفاه الناعمة طوال اليوم."},
+    {id: 2, nameEn: "Savings Package", nameAr: "الباقة الذهبية", price: 380, image: "photo_2025-12-14_16-51-26 (2).jpg", descEn: "Winter is here and your skin is calling for hydration! If you don't have a moisturizing routine to save you from winter dryness, you need to check out this package from Derma Care.", descAr: "شتا دخل... وجلدك بينادي على الترطيب ❄️ لو لسه معندكيش روتين ترطيب ينقذك من جفاف الشتا يبقى لازم تشوفي الباكيدج دي من Derma Care."},
+    {id: 3, nameEn: "Body Lotion", nameAr: "لوشن الجسم", price: 280, image: "photo_2025-12-14_16-54-49.jpg", descEn: "125 ml - Derma Care Body Lotion is your ideal companion, combining strawberry and rose vanilla scent.", descAr: "بادي لوشن ديرما كير هو رفيقك المثالي يجمع ما بين رائحة الفرولة والروز فانيليا."},
+    {id: 4, nameEn: "Pure Henna Powder", nameAr: "سدر مطحون نقي", price: 180, image: "photo_2025-12-14_16-48-51.jpg", descEn: "Pure natural henna powder for hair and skin care.", descAr: "سدر مطحون نقي للعناية بالشعر والبشرة."},
+    {id: 5, nameEn: "Body Butter", nameAr: "زبدة الجسم", price: 120, image: "photo_2025-12-14_16-50-56.jpg", descEn: "50g - Body butter with strawberry and rose vanilla scent.", descAr: "50 جرام - زبدة الجسم برائحة الفراولة والوردة والفانيلياً."},
+    {id: 6, nameEn: "Tint Creamy", nameAr: "تينت كريمي", price: 120, image: "photo_2025-12-14_16-49-41.jpg", descEn: "Creamy tint for a natural rosy look.", descAr: "تينت克里مي لمظهر وردي طبيعي."},
+    {id: 7, nameEn: "Body Butter (Large)", nameAr: "زبدة الجسم الكبيرة", price: 200, image: "photo_2025-12-14_16-50-56.jpg", descEn: "100g - Body butter recommended to use after showering.", descAr: "100 جرام - زبدة الجسم يُنصح باستخدامها بعد الاستحمام."},
+    {id: 8, nameEn: "Moroccan Soap with Argan Oil", nameAr: "الصابون المغربي بزيت الأرجان", price: 480, image: "WhatsApp Image 2026-03-03 at 11.33.47 PM.jpeg", descEn: "Moroccan Soap with Argan Oil - Argan oil is known for its strong hydration.", descAr: "الصابون المغربي بزيت الأرجان - زيت الأرجان معروف بترطيبه القوي."},
+    {id: 9, nameEn: "Lip Gloss", nameAr: "ليب جلوس", price: 100, image: "WhatsApp Image 2026-03-03 at 11.34.44 PM.jpeg", descEn: "Lip Gloss - A therapeutic lip gloss rich with vitamin E.", descAr: "ليب جلوس تنافس أجمد براند 🤏💗"},
+    {id: 10, nameEn: "Foot Care Set (Sock + File)", nameAr: "مجموعة العناية بالقدمين", price: 180, image: "WhatsApp Image 2026-03-03 at 11.36.34 PM.jpeg", descEn: "Foot Care Set - Silicon Gel Sock with Vitamin E + VIP Foot File.", descAr: "مجموعة العناية بالقدمين - شراب سيلكون چيل بفيتامبن E + مبرد القدمين."}
+    ];
+    
+    function getProductName(product) {
+        var lang = localStorage.getItem("lang") || "en";
+        return lang === "ar" ? product.nameAr : product.nameEn;
+    }
+    
+    function renderProducts() {
+        var contant = document.getElementById("contaner");
+        contant.innerHTML = "";
+        var btnText = localStorage.getItem("lang") === "ar" ? "عرض المنتج" : "view product";
+        
+        contants.forEach(function(content) {
+            contant.innerHTML += "<div class='card'><img src='" + content.image + "' onclick='goToprodact(" + content.id + ")'><h3 onclick='goToprodact(" + content.id + ")'>" + getProductName(content) + "</h3><div class='price'>" + content.price + " LE</div><button class='btn' onclick='goToprodact(" + content.id + ")'>" + btnText + "</button></div>";
+        });
+    }
+    
+    function updateNavAndHeader() {
+        var lang = localStorage.getItem("lang") || "en";
+        var navLinks = document.querySelectorAll("#navMenu li a");
+        if (navLinks[0]) navLinks[0].textContent = lang === "ar" ? "الرئيسية" : "Home";
+        if (navLinks[1]) navLinks[1].textContent = lang === "ar" ? "عن الشركة" : "About As";
+        if (navLinks[2]) navLinks[2].textContent = lang === "ar" ? "المنتجات" : "Prodacts";
+        if (navLinks[3]) navLinks[3].textContent = lang === "ar" ? "اتصل بنا" : "Contact";
+        
+        var headerH1 = document.querySelector(".header h1");
+        if (headerH1) headerH1.textContent = lang === "ar" ? "مرحباً بك في درما كير" : "Welcome To Derma Care";
+        
+        var headerP = document.querySelector(".header p");
+        if (headerP) headerP.textContent = lang === "ar" ? "العناية بالجمال" : "Beauty Care";
+        
+        var footerText = document.getElementById("footerText");
+        if (footerText) footerText.textContent = lang === "ar" ? "جميع الحقوق محفوظة" : "All Rights Reserved";
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        var savedLang = localStorage.getItem("lang");
+        if (savedLang) {
+            document.body.dir = savedLang === "ar" ? "rtl" : "ltr";
+            document.getElementById("langBtn").textContent = savedLang === "en" ? "العربية" : "English";
+        }
+        renderProducts();
+        updateNavAndHeader();
+    });
+    
+    function goToprodact(id) {
+        window.location.href = "image.html?id=" + id;
+    }
+    
+    function toggleMenu() {
+        document.getElementById("navMenu").classList.toggle("active");
+    }
+    </script>
+    
+    <footer>
+     <p>01030006247</p>
+     <p>Derma Care</p>
+     <p id="footerText">All Rights Reserved</p>
+    </footer>
+</body>
+</html>
