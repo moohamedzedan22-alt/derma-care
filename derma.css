@@ -691,11 +691,12 @@ select {
 .offer img{
 border-radius: 12px;
 width: 300px;
+
 }
 .offer{
     align-items: center;
 justify-content: center;
 display: flex;
 text-align: center;
-
+margin-top:10px;
 }
