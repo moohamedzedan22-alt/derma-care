@@ -688,3 +688,14 @@ select {
         padding: 12px;
     }
 }
+.offer img{
+border-radius: 12px;
+width: 400px;
+}
+.offer{
+    align-items: center;
+justify-content: center;
+display: flex;
+text-align: center;
+
+}
