@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Derma Care</title>
     <link rel="stylesheet" href="derma.css">
+    <style>
+        /* Admin icon in navbar */
+        .admin-nav-link {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 17px;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .admin-nav-link:hover { color: #ffe0ec; background: rgba(255,255,255,0.3); }
+        .admin-nav-link.visible { display: flex; }
+        .admin-icon { font-size: 18px; }
+    </style>
 </head>
 <body>
 
@@ -17,6 +36,11 @@
         <li><a href="about.html">About As</a></li>
         <li><a href="prodact.html">Prodacts</a></li>
         <li><a href="contant.html">Contact</a></li>
+        <li>
+            <a href="admin.html" class="admin-nav-link" id="adminNavLink" title="Admin Dashboard">
+                <span class="admin-icon">⚙️</span> Admin
+            </a>
+        </li>
     </ul>
     </nav>
     
@@ -27,6 +51,9 @@
     
     <div class="content" id="contaner"></div>
     
+    <!-- Shared data store -->
+    <script src="products.js"></script>
+
     <script>
     document.write('<button id="langBtn" onclick="toggleLang()" style="position:fixed;top:80px;right:20px;z-index:1001;padding:10px 20px;background:white;border:2px solid rgb(235, 65, 121);border-radius:20px;cursor:pointer;font-weight:bold;color:rgb(235, 65, 121)">العربية</button>');
 
@@ -40,26 +67,15 @@
         updateNavAndHeader();
     }
 
-    var contants = [
-    {id: 1, nameEn: "Lip Balm", nameAr: "ليپ بالم", price: 100, image: "ةخاشةثي.jpeg"},
-    {id: 2, nameEn: "Savings Package", nameAr: "الباقة الذهبية", price: 440, image: "WhatsApp Image 2026-05-13 at 4.18.45 PM.jpeg"},
-    {id: 3, nameEn: "Body Lotion", nameAr: "بادي لوشن", price: 270, image: "Whatsapp Image 2026-05-13 at 4.18.40 PM.jpeg"},
-    {id: 4, nameEn: "Pure Henna Powder", nameAr: "سدر مغربي", price: 180, image: "photo_2025-12-14_16-48-51.jpg"},
-    {id: 5, nameEn: "Body Butter", nameAr: "بادي باتر", price: 120, image: "WhatsApb Image 2026-05-13 at 4.18.40 PM.jpeg"},
-    {id: 6, nameEn: "Tint Creamy", nameAr: "تينت كريمي", price: 130, image: "WhatsApp Image 2026-05-14 at 10.08.3 PM.jpeg"},
-    {id: 7, nameEn: "Body Butter Large", nameAr: "بادي باتر كبير", price: 230, image: "WhatsApb Image 2026-05-13 at 4.18.40 PM.jpeg"},
-    {id: 8, nameEn: "Lip Gloss", nameAr: "ليب جلوس", price: 100, image: "WhatsApp Image 2026-03-03 at 11.34.44 PM.jpeg"},
-    {id: 9, nameEn: "Moroccan soap", nameAr: "صابون مغربي", price: 480, image: "WhatsApp Image 2026-03-03 at 11.33.47 PM.jpeg"},
-    {id: 10, nameEn: "Foot Care Set", nameAr: "مجموعة العناية بالقدمين", price: 350, image: "WhatsApp Image 2026-05-13 at 4.18.15 PM.jpeg"},
-    {id:11, nameEn:"shampo and conditionr", nameAr:" بلسم و شامبو" , price:450, image:"WhatsApp Image 2026-05-13 at 4.18.41 PM.jpeg"}
-    ];
-    
     function getProductName(product) {
         var lang = localStorage.getItem("lang") || "en";
         return lang === "ar" ? product.nameAr : product.nameEn;
     }
     
     function renderProducts() {
+        // Always load fresh from localStorage
+        var contants = DC_getProducts();
+
         var contant = document.getElementById("contaner");
         contant.innerHTML = "";
         var btnText = localStorage.getItem("lang") === "ar" ? "عرض المنتج" : "view product";
@@ -71,7 +87,7 @@
     
     function updateNavAndHeader() {
         var lang = localStorage.getItem("lang") || "en";
-        var navLinks = document.querySelectorAll("#navMenu li a");
+        var navLinks = document.querySelectorAll("#navMenu li a:not(.admin-nav-link)");
         if (navLinks[0]) navLinks[0].textContent = lang === "ar" ? "الرئيسية" : "Home";
         if (navLinks[1]) navLinks[1].textContent = lang === "ar" ? "عن الشركة" : "About As";
         if (navLinks[2]) navLinks[2].textContent = lang === "ar" ? "المنتجات" : "Prodacts";
@@ -86,6 +102,17 @@
         var footerText = document.getElementById("footerText");
         if (footerText) footerText.textContent = lang === "ar" ? "جميع الحقوق محفوظة" : "All Rights Reserved";
     }
+
+    function updateAdminIcon() {
+        var adminLink = document.getElementById("adminNavLink");
+        if (adminLink) {
+            if (DC_isAdminLoggedIn()) {
+                adminLink.classList.add("visible");
+            } else {
+                adminLink.classList.remove("visible");
+            }
+        }
+    }
     
     document.addEventListener("DOMContentLoaded", function() {
         var savedLang = localStorage.getItem("lang");
@@ -95,6 +122,7 @@
         }
         renderProducts();
         updateNavAndHeader();
+        updateAdminIcon();
     });
     
     function goToprodact(id) {
