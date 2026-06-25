@@ -8,7 +8,7 @@
     <style>
         /* Admin icon in navbar */
         .admin-nav-link {
-            display: none;
+            display: flex;
             align-items: center;
             gap: 6px;
             text-decoration: none;
@@ -21,7 +21,6 @@
             font-weight: bold;
         }
         .admin-nav-link:hover { color: #ffe0ec; background: rgba(255,255,255,0.3); }
-        .admin-nav-link.visible { display: flex; }
         .admin-icon { font-size: 18px; }
     </style>
 </head>
@@ -37,8 +36,8 @@
         <li><a href="#">Prodacts</a></li>
         <li><a href="contant.html">Contact</a></li>
         <li>
-            <a href="admin.html" class="admin-nav-link" id="adminNavLink" title="Admin Dashboard">
-                <span class="admin-icon">⚙️</span> Admin
+            <a href="admin.html" class="admin-nav-link" id="adminNavLink" title="Admin">
+                <span class="admin-icon">👤</span> Login
             </a>
         </li>
     </ul>
@@ -58,6 +57,7 @@
         document.getElementById("langBtn").textContent = newLang === "en" ? "العربية" : "English";
         renderProducts();
         updateContent();
+        updateAdminIcon();
     }
     
     function updateContent() {
@@ -110,11 +110,12 @@
 
     function updateAdminIcon() {
         var adminLink = document.getElementById("adminNavLink");
+        var lang = localStorage.getItem("lang") || "en";
         if (adminLink) {
             if (DC_isAdminLoggedIn()) {
-                adminLink.classList.add("visible");
+                adminLink.innerHTML = '<span class="admin-icon">⚙️</span> ' + (lang === "ar" ? "لوحة التحكم" : "Admin");
             } else {
-                adminLink.classList.remove("visible");
+                adminLink.innerHTML = '<span class="admin-icon">👤</span> ' + (lang === "ar" ? "تسجيل الدخول" : "Login");
             }
         }
     }
