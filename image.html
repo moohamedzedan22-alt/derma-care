@@ -42,6 +42,8 @@
     </ul>
     </nav>
 
+    <!-- IndexedDB Database Layer -->
+    <script src="db.js"></script>
     <!-- Shared data store -->
     <script src="products.js"></script>
 
@@ -90,8 +92,24 @@
         return lang === "ar" ? product.descAr : product.descEn;
     }
     
+    function getImgSrc(p) {
+        return p.imageData || p.image || '';
+    }
+
     function renderProduct() {
-        var prodacts = DC_getProducts();
+        DermaCareDB.getAllProducts(function(err, products) {
+            if (err || !products || !products.length) {
+                // Fallback seed
+                DermaCareDB.seedIfEmpty(DEFAULT_PRODUCTS, function() {
+                    DermaCareDB.getAllProducts(function(e2, prods) { _doRenderProduct(prods || []); });
+                });
+                return;
+            }
+            _doRenderProduct(products);
+        });
+    }
+
+    function _doRenderProduct(prodacts) {
         var url = new URLSearchParams(window.location.search);
         var proid = parseInt(url.get("id"));
         var prodact = prodacts.find(function(p) { return p.id === proid; });
@@ -102,7 +120,16 @@
         var checkoutText = localStorage.getItem("lang") === "ar" ? "الدفع" : "check out";
         
         if (prodact) {
-            cont.innerHTML = "<img src='" + prodact.image + "'><div class='info'><h3>" + getProductName(prodact) + "</h3><div class='desc'>" + (getProductDesc(prodact) || "").replace(/\n/g, '<br>') + "</div><div class='price'>" + prodact.price + " LE</div><button class='btn' onclick='addToCart(" + prodact.id + ")'>" + btnText + "</button></div>";
+            var imgSrc = getImgSrc(prodact);
+            var imgTag = imgSrc
+                ? "<img src='" + imgSrc + "' onerror=\"this.style.background='#fde8ec';this.src=''\">" 
+                : "<div style='width:100%;min-height:200px;background:#fde8ec;display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:12px'>🌸</div>";
+            cont.innerHTML = imgTag
+                + "<div class='info'><h3>" + getProductName(prodact) + "</h3>"
+                + "<div class='desc'>" + (getProductDesc(prodact) || "").replace(/\n/g, '<br>') + "</div>"
+                + "<div class='price'>" + prodact.price + " LE</div>"
+                + "<button class='btn' onclick='addToCart(" + prodact.id + ")'>"
+                + btnText + "</button></div>";
         } else {
              cont.innerHTML = "<p>Product not found.</p>";
         }
@@ -125,8 +152,8 @@
     function savecart(cart) { localStorage.setItem("cart", JSON.stringify(cart)); }
 
     function addToCart(id) {
-        var prodacts = DC_getProducts();
-        var p = prodacts.find(function(prod) { return prod.id === id; });
+        DermaCareDB.getAllProducts(function(err, prodacts) {
+        var p = (prodacts||[]).find(function(prod) { return prod.id === id; });
         if (!p) return;
         var cart = getcart();
         var existingItem = cart.find(function(item) { return item.id === id; });
@@ -140,6 +167,7 @@
         savecart(cart);
         updateCart();
         openCart();
+        });
     }
     
     function updateCart() {

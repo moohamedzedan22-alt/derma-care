@@ -50,6 +50,8 @@
     
     <div class="content" id="contaner"></div>
     
+    <!-- IndexedDB Database Layer -->
+    <script src="db.js"></script>
     <!-- Shared data store -->
     <script src="products.js"></script>
 
@@ -72,16 +74,39 @@
         return lang === "ar" ? product.nameAr : product.nameEn;
     }
     
-    function renderProducts() {
-        // Always load fresh from localStorage
-        var contants = DC_getProducts();
+    function getImgSrc(p) {
+        return p.imageData || p.image || '';
+    }
 
+    function renderProducts() {
+        DermaCareDB.getAllProducts(function(err, products) {
+            if (err || !products || !products.length) {
+                DermaCareDB.seedIfEmpty(DEFAULT_PRODUCTS, function() {
+                    DermaCareDB.getAllProducts(function(e2, prods) { _doRender(prods || []); });
+                });
+                return;
+            }
+            _doRender(products);
+        });
+    }
+
+    function _doRender(contants) {
         var contant = document.getElementById("contaner");
         contant.innerHTML = "";
         var btnText = localStorage.getItem("lang") === "ar" ? "عرض المنتج" : "view product";
-        
+        contants = contants.sort(function(a,b){ return (a.createdAt||0)-(b.createdAt||0); });
+
         contants.forEach(function(content) {
-            contant.innerHTML += "<div class='card'><img src='" + content.image + "' onclick='goToprodact(" + content.id + ")'><h3 onclick='goToprodact(" + content.id + ")'>" + getProductName(content) + "</h3><div class='price'>" + content.price + " LE</div><button class='btn' onclick='goToprodact(" + content.id + ")'>" + btnText + "</button></div>";
+            var imgSrc = getImgSrc(content);
+            var imgTag = imgSrc
+                ? "<img src='" + imgSrc + "' onclick='goToprodact(" + content.id + ")' onerror=\"this.style.background='#fde8ec';this.src=''\">"
+                : "<div style='width:100%;aspect-ratio:1;background:#fde8ec;display:flex;align-items:center;justify-content:center;font-size:2.5rem;cursor:pointer;border-radius:12px' onclick='goToprodact(" + content.id + ")'>🌸</div>";
+            contant.innerHTML += "<div class='card'>" + imgTag
+                + "<h3 onclick='goToprodact(" + content.id + ")'>"
+                + getProductName(content) + "</h3>"
+                + "<div class='price'>" + content.price + " LE</div>"
+                + "<button class='btn' onclick='goToprodact(" + content.id + ")'>"
+                + btnText + "</button></div>";
         });
     }
     

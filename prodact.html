@@ -43,6 +43,8 @@
     </ul>
     </nav>
     
+    <!-- IndexedDB Database Layer -->
+    <script src="db.js"></script>
     <!-- Shared data store -->
     <script src="products.js"></script>
 
@@ -88,15 +90,39 @@
     }
     
     function renderProducts() {
-        // Always load fresh from localStorage
-        var prodacts = DC_getProducts();
+        // Load fresh from IndexedDB
+        DermaCareDB.getAllProducts(function(err, products) {
+            if (err || !products.length) {
+                // Fallback: seed from defaults then re-render
+                DermaCareDB.seedIfEmpty(DEFAULT_PRODUCTS, function() {
+                    DermaCareDB.getAllProducts(function(err2, prods) {
+                        _doRender(prods || []);
+                    });
+                });
+                return;
+            }
+            _doRender(products);
+        });
+    }
 
+    function getImgSrc(p) {
+        return p.imageData || p.image || '';
+    }
+
+    function _doRender(prodacts) {
         var container = document.getElementById("contaner");
         container.innerHTML = "";
         var btnText = localStorage.getItem("lang") === "ar" ? "عرض المنتج" : "view product";
-        
+        prodacts = prodacts.sort(function(a,b){ return (a.createdAt||0)-(b.createdAt||0); });
         prodacts.forEach(function(prodact) {
-            container.innerHTML += "<div class='car'><img class='image' src='" + prodact.image + "' onclick='goToprodact(" + prodact.id + ")'><h3 onclick='goToprodact(" + prodact.id + ")'>" + getProductName(prodact) + "</h3><div class='pric'>" + prodact.price + " LE</div><button class='bt' onclick='goToprodact(" + prodact.id + ")'>" + btnText + "</button></div>";
+            var imgSrc = getImgSrc(prodact);
+            var imgTag = imgSrc
+                ? "<img class='image' src='" + imgSrc + "' onclick='goToprodact(" + prodact.id + ")' onerror=\"this.style.background='#fde8ec';this.src=''\">"
+                : "<div class='image' style='background:#fde8ec;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer' onclick='goToprodact(" + prodact.id + ")'>🌸</div>";
+            container.innerHTML += "<div class='car'>" + imgTag + "<h3 onclick='goToprodact(" + prodact.id + ")'>"
+                + getProductName(prodact) + "</h3><div class='pric'>" + prodact.price + " LE</div>"
+                + "<button class='bt' onclick='goToprodact(" + prodact.id + ")'>"
+                + btnText + "</button></div>";
         });
     }
     
