@@ -742,25 +742,53 @@
       direction: rtl;
     }
 
-    .img-preview-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    #imgPreview {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 2px solid var(--border);
-      display: none;
+    /* ── Photo Upload Zone ───────────────────────────────────────── */
+    .upload-zone {
+      border: 2px dashed var(--rose-light);
+      border-radius: var(--radius-md);
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
       background: var(--blush);
+      position: relative;
     }
-
-    #imgPreview.visible {
-      display: block;
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--rose);
+      background: var(--rose-pale);
+      box-shadow: 0 0 0 4px rgba(232,99,122,.10);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0;
+      cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 2rem; margin-bottom: 6px; display: block; }
+    .upload-label { font-size: .85rem; color: var(--text-mid); font-weight: 500; }
+    .upload-sub   { font-size: .75rem; color: var(--text-soft); margin-top: 3px; }
+    .upload-preview {
+      display: none; margin-top: 12px;
+      position: relative; width: fit-content; margin-inline: auto;
+    }
+    .upload-preview.visible { display: block; }
+    .upload-preview img {
+      width: 110px; height: 110px; object-fit: cover;
+      border-radius: var(--radius-sm); border: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .upload-remove {
+      position: absolute; top: -8px; right: -8px;
+      width: 24px; height: 24px; background: #e05370;
+      border: none; border-radius: 50%; color: #fff;
+      font-size: .75rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: var(--transition);
+    }
+    .upload-remove:hover { background: #c0392b; transform: scale(1.1); }
+    .upload-name {
+      font-size: .75rem; color: var(--text-soft); margin-top: 4px;
+      text-align: center; max-width: 140px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-inline: auto;
     }
 
     .modal-footer {
@@ -1079,7 +1107,9 @@
 
 <body>
 
-  <!-- Shared product store -->
+  <!-- IndexedDB layer -->
+  <script src="db.js"></script>
+  <!-- Shared product store (default seed data) -->
   <script src="products.js"></script>
 
   <!-- ════════════════════════════════════ LOGIN OVERLAY ══════════════ -->
@@ -1241,17 +1271,23 @@
               <input type="number" id="fPrice" class="form-input" placeholder="e.g. 100" min="0" required />
             </div>
 
-            <div class="form-group">
-              <label for="fImage">Image Filename</label>
-              <input type="text" id="fImage" class="form-input" placeholder="e.g. product.jpeg"
-                oninput="previewImage(this.value)" />
-            </div>
-
             <div class="form-group full">
-              <div class="img-preview-wrap">
-                <img id="imgPreview" alt="Preview" />
-                <span style="font-size:.8rem;color:var(--text-soft)">Image preview (must be in same folder)</span>
+              <label>Product Photo</label>
+              <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fImageFile" accept="image/*" onchange="handleFileSelect(this.files[0])" />
+                <span class="upload-icon">📸</span>
+                <div class="upload-label">Click or drag &amp; drop a photo from your PC</div>
+                <div class="upload-sub">JPG · PNG · WEBP · GIF — any size</div>
               </div>
+              <div class="upload-preview" id="uploadPreview">
+                <img id="imgPreview" alt="Preview" />
+                <button type="button" class="upload-remove" onclick="removePhoto()" title="Remove">✕</button>
+                <div class="upload-name" id="uploadName"></div>
+              </div>
+              <!-- base64 data of newly-uploaded photo -->
+              <input type="hidden" id="fImageData" value="" />
+              <!-- existing image src when editing -->
+              <input type="hidden" id="fImageExisting" value="" />
             </div>
 
             <div class="form-group full">
@@ -1298,23 +1334,92 @@
 
   <!-- ════════════════════════════════════ JAVASCRIPT ══════════════════ -->
   <script>
-    /* ── Product Data (from localStorage via products.js) ───────────── */
-    var prodacts = DC_getProducts();
+    /* ════════════════════════════════════════════════════════════════
+       DERMA CARE ADMIN — IndexedDB Edition
+       Products + uploaded photos stored in browser IndexedDB (db.js)
+    ════════════════════════════════════════════════════════════════ */
 
-    /* ── State ───────────────────────────────────────────────────────── */
-    var searchTerm = '';
+    /* ── State ───────────────────────────────────────────────────── */
+    var allProducts    = [];
+    var searchTerm     = '';
     var pendingDeleteId = null;
 
-    /* ── Render Table ────────────────────────────────────────────────── */
+    /* ── Escape helper ───────────────────────────────────────────── */
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    /* ── Image helpers ───────────────────────────────────────────── */
+    function getImgSrc(p) { return p.imageData || p.image || ''; }
+
+    function buildImgCell(p) {
+      var src = getImgSrc(p);
+      if (src) {
+        return '<div class="prod-img-wrap"><img src="' + esc(src) + '" alt="' + esc(p.nameEn) +
+          '" onerror="this.parentNode.innerHTML=\'<div class=&quot;img-placeholder&quot;>🌸</div>\'"/></div>';
+      }
+      return '<div class="prod-img-wrap"><div class="img-placeholder">🌸</div></div>';
+    }
+
+    /* ── Drag-and-drop init ──────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+      var zone = document.getElementById('uploadZone');
+      if (!zone) return;
+      zone.addEventListener('dragover', function (e) {
+        e.preventDefault(); zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', function () {
+        zone.classList.remove('drag-over');
+      });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) handleFileSelect(file);
+      });
+    });
+
+    function handleFileSelect(file) {
+      if (!file) return;
+      DermaCareDB.fileToBase64(file, function (err, dataUrl) {
+        if (err) { showToast('❌ Could not read image file.', 'error'); return; }
+        document.getElementById('fImageData').value = dataUrl;
+        document.getElementById('imgPreview').src   = dataUrl;
+        document.getElementById('uploadPreview').classList.add('visible');
+        document.getElementById('uploadName').textContent = file.name;
+      });
+    }
+
+    function removePhoto() {
+      document.getElementById('fImageData').value     = '';
+      document.getElementById('fImageExisting').value = '';
+      document.getElementById('imgPreview').src        = '';
+      document.getElementById('uploadPreview').classList.remove('visible');
+      document.getElementById('uploadName').textContent = '';
+      document.getElementById('fImageFile').value = '';
+    }
+
+    /* ── Load & Render ───────────────────────────────────────────── */
+    function loadAndRender() {
+      DermaCareDB.getAllProducts(function (err, products) {
+        if (err) { showToast('⚠️ DB error: ' + err.message, 'error'); return; }
+        allProducts = (products || []).sort(function (a, b) {
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        });
+        renderTable();
+      });
+    }
+
     function renderTable() {
-      var tbody = document.getElementById('productTbody');
-      var empty = document.getElementById('emptyState');
+      var tbody   = document.getElementById('productTbody');
+      var empty   = document.getElementById('emptyState');
       var tableEl = document.getElementById('productTable');
 
-      var filtered = prodacts.filter(function (p) {
+      var filtered = allProducts.filter(function (p) {
         if (!searchTerm) return true;
         var q = searchTerm.toLowerCase();
-        return p.nameEn.toLowerCase().includes(q) || p.nameAr.includes(searchTerm);
+        return (p.nameEn||'').toLowerCase().includes(q) || (p.nameAr||'').includes(searchTerm);
       });
 
       tbody.innerHTML = '';
@@ -1325,11 +1430,9 @@
       } else {
         tableEl.style.display = '';
         empty.classList.remove('visible');
-
         filtered.forEach(function (p, idx) {
           var row = document.createElement('tr');
-          row.id = 'row-' + p.id;
-
+          row.id  = 'row-' + p.id;
           row.innerHTML =
             '<td class="td-num">' + (idx + 1) + '</td>' +
             '<td>' + buildImgCell(p) + '</td>' +
@@ -1340,180 +1443,145 @@
             '<button class="btn btn-edit" onclick="openEditModal(' + p.id + ')">✏️ Edit</button>' +
             '<button class="btn btn-delete" onclick="openConfirmDelete(' + p.id + ')">🗑️ Delete</button>' +
             '</div></td>';
-
           tbody.appendChild(row);
         });
       }
-
       updateStats(filtered);
     }
 
-    function buildImgCell(p) {
-      if (p.image) {
-        return '<div class="prod-img-wrap"><img src="' + esc(p.image) + '" alt="' + esc(p.nameEn) + '" onerror="this.parentNode.innerHTML=\'<div class=&quot;img-placeholder&quot;>🌸</div>\'"/></div>';
-      }
-      return '<div class="prod-img-wrap"><div class="img-placeholder">🌸</div></div>';
-    }
-
-    function esc(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    /* ── Stats ───────────────────────────────────────────────────────── */
+    /* ── Stats ───────────────────────────────────────────────────── */
     function updateStats(filtered) {
-      var total = prodacts.length;
+      var total  = allProducts.length;
       var showing = filtered.length;
-      var prices = prodacts.map(function (p) { return p.price; });
-      var avg = prices.length ? Math.round(prices.reduce(function (a, b) { return a + b; }, 0) / prices.length) : 0;
+      var prices = allProducts.map(function (p) { return Number(p.price)||0; });
+      var avg = prices.length ? Math.round(prices.reduce(function(a,b){return a+b;},0)/prices.length) : 0;
       var max = prices.length ? Math.max.apply(null, prices) : 0;
-
-      document.getElementById('statTotal').textContent = total;
-      document.getElementById('statAvg').textContent = avg;
-      document.getElementById('statMax').textContent = max;
+      document.getElementById('statTotal').textContent    = total;
+      document.getElementById('statAvg').textContent      = avg;
+      document.getElementById('statMax').textContent      = max;
       document.getElementById('statFiltered').textContent = showing;
-      document.getElementById('headerCount').textContent = total;
-      document.getElementById('tableCount').textContent =
-        searchTerm
-          ? 'Showing ' + showing + ' of ' + total + ' products'
-          : 'Showing all ' + total + ' products';
+      document.getElementById('headerCount').textContent  = total;
+      document.getElementById('tableCount').textContent   =
+        searchTerm ? 'Showing '+showing+' of '+total+' products' : 'Showing all '+total+' products';
     }
 
-    /* ── Search ──────────────────────────────────────────────────────── */
+    /* ── Search ──────────────────────────────────────────────────── */
     function onSearch(val) {
       searchTerm = val.trim();
       document.getElementById('searchClear').classList.toggle('visible', searchTerm.length > 0);
       renderTable();
     }
-
     function clearSearch() {
       document.getElementById('searchInput').value = '';
       onSearch('');
       document.getElementById('searchInput').focus();
     }
 
-    /* ── Modal Helpers ───────────────────────────────────────────────── */
+    /* ── Modal helpers ───────────────────────────────────────────── */
     function openModal(title, icon) {
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalIcon').textContent = icon;
+      document.getElementById('modalTitle').textContent    = title;
+      document.getElementById('modalIcon').textContent     = icon;
       document.getElementById('submitBtnText').textContent = 'Save Product';
       document.getElementById('productModal').classList.add('open');
       document.body.style.overflow = 'hidden';
       setTimeout(function () { document.getElementById('fNameEn').focus(); }, 150);
     }
-
     function closeModal() {
       document.getElementById('productModal').classList.remove('open');
       document.body.style.overflow = '';
       resetForm();
     }
-
     function handleBackdropClick(e) {
       if (e.target === document.getElementById('productModal')) closeModal();
     }
-
     function resetForm() {
       document.getElementById('productForm').reset();
-      document.getElementById('editId').value = '';
-      var prev = document.getElementById('imgPreview');
-      prev.src = '';
-      prev.classList.remove('visible');
+      document.getElementById('editId').value         = '';
+      document.getElementById('fImageData').value     = '';
+      document.getElementById('fImageExisting').value = '';
+      document.getElementById('imgPreview').src        = '';
+      document.getElementById('uploadPreview').classList.remove('visible');
+      document.getElementById('uploadName').textContent = '';
     }
 
-    /* ── Add Modal ───────────────────────────────────────────────────── */
-    function openAddModal() {
-      resetForm();
-      openModal('Add New Product', '＋');
-    }
+    /* ── Add Modal ───────────────────────────────────────────────── */
+    function openAddModal() { resetForm(); openModal('Add New Product', '＋'); }
 
-    /* ── Edit Modal ──────────────────────────────────────────────────── */
+    /* ── Edit Modal ──────────────────────────────────────────────── */
     function openEditModal(id) {
-      var p = prodacts.find(function (x) { return x.id === id; });
+      var p = allProducts.find(function (x) { return x.id === id; });
       if (!p) return;
-
-      document.getElementById('editId').value = id;
-      document.getElementById('fNameEn').value = p.nameEn;
-      document.getElementById('fNameAr').value = p.nameAr;
-      document.getElementById('fPrice').value = p.price;
-      document.getElementById('fImage').value = p.image || '';
+      document.getElementById('editId').value  = id;
+      document.getElementById('fNameEn').value = p.nameEn || '';
+      document.getElementById('fNameAr').value = p.nameAr || '';
+      document.getElementById('fPrice').value  = p.price  || '';
       document.getElementById('fDescEn').value = p.descEn || '';
       document.getElementById('fDescAr').value = p.descAr || '';
-      previewImage(p.image || '');
-
+      var existingSrc = getImgSrc(p);
+      document.getElementById('fImageExisting').value = existingSrc;
+      if (existingSrc) {
+        document.getElementById('imgPreview').src = existingSrc;
+        document.getElementById('uploadPreview').classList.add('visible');
+        document.getElementById('uploadName').textContent = p.image || 'Uploaded photo';
+      }
       openModal('Edit Product', '✏️');
       document.getElementById('submitBtnText').textContent = 'Update Product';
     }
 
-    /* ── Image Preview ───────────────────────────────────────────────── */
-    function previewImage(filename) {
-      var prev = document.getElementById('imgPreview');
-      if (!filename.trim()) {
-        prev.src = '';
-        prev.classList.remove('visible');
-        return;
-      }
-      prev.src = filename.trim();
-      prev.classList.add('visible');
-      prev.onerror = function () { prev.classList.remove('visible'); prev.src = ''; };
-    }
-
-    /* ── Form Submit ─────────────────────────────────────────────────── */
+    /* ── Form Submit ─────────────────────────────────────────────── */
     function handleFormSubmit(e) {
       e.preventDefault();
+      var nameEn   = document.getElementById('fNameEn').value.trim();
+      var nameAr   = document.getElementById('fNameAr').value.trim();
+      var price    = parseFloat(document.getElementById('fPrice').value);
+      var descEn   = document.getElementById('fDescEn').value.trim();
+      var descAr   = document.getElementById('fDescAr').value.trim();
+      var editId   = document.getElementById('editId').value;
+      var newImg   = document.getElementById('fImageData').value;
+      var existing = document.getElementById('fImageExisting').value;
 
-      var nameEn = document.getElementById('fNameEn').value.trim();
-      var nameAr = document.getElementById('fNameAr').value.trim();
-      var price = parseFloat(document.getElementById('fPrice').value);
-      var image = document.getElementById('fImage').value.trim();
-      var descEn = document.getElementById('fDescEn').value.trim();
-      var descAr = document.getElementById('fDescAr').value.trim();
-      var editId = document.getElementById('editId').value;
-
-      /* Validation */
       if (!nameEn || !nameAr || isNaN(price) || price < 0) {
-        showToast('⚠️ Please fill in all required fields.', 'error');
-        return;
+        showToast('⚠️ Please fill in all required fields.', 'error'); return;
       }
+
+      // Decide what to store as imageData vs legacy image filename
+      var imageData = '';
+      var imageName = '';
+      if (newImg) {
+        imageData = newImg;                    // freshly uploaded base64
+      } else if (existing && existing.startsWith('data:')) {
+        imageData = existing;                  // kept existing base64
+      } else if (existing) {
+        imageName = existing;                  // legacy filename
+      }
+
+      var record = {
+        nameEn: nameEn, nameAr: nameAr, price: price,
+        descEn: descEn, descAr: descAr,
+        imageData: imageData, image: imageName
+      };
 
       if (editId) {
-        /* UPDATE */
-        var idx = prodacts.findIndex(function (p) { return p.id === parseInt(editId); });
-        if (idx > -1) {
-          prodacts[idx].nameEn = nameEn;
-          prodacts[idx].nameAr = nameAr;
-          prodacts[idx].price = price;
-          prodacts[idx].image = image;
-          prodacts[idx].descEn = descEn;
-          prodacts[idx].descAr = descAr;
-          DC_saveProducts(prodacts);
-          showToast('✅ Product updated successfully!', 'success');
-        }
-      } else {
-        /* ADD */
-        prodacts.push({
-          id: DC_getNextId(),
-          nameEn: nameEn,
-          nameAr: nameAr,
-          price: price,
-          image: image,
-          descEn: descEn,
-          descAr: descAr
+        record.id = parseInt(editId);
+        var ep = allProducts.find(function(x){ return x.id === record.id; });
+        if (ep) record.createdAt = ep.createdAt;
+        DermaCareDB.updateProduct(record, function (err) {
+          if (err) { showToast('❌ Update failed: ' + err.message, 'error'); return; }
+          showToast('✅ Product updated!', 'success');
+          closeModal(); loadAndRender();
         });
-        DC_saveProducts(prodacts);
-        showToast('🌸 New product added!', 'success');
+      } else {
+        DermaCareDB.addProduct(record, function (err) {
+          if (err) { showToast('❌ Save failed: ' + err.message, 'error'); return; }
+          showToast('🌸 New product added!', 'success');
+          closeModal(); loadAndRender();
+        });
       }
-
-      closeModal();
-      renderTable();
     }
 
-    /* ── Delete ──────────────────────────────────────────────────────── */
+    /* ── Delete ──────────────────────────────────────────────────── */
     function openConfirmDelete(id) {
-      var p = prodacts.find(function (x) { return x.id === id; });
+      var p = allProducts.find(function (x) { return x.id === id; });
       if (!p) return;
       pendingDeleteId = id;
       document.getElementById('confirmMsg').textContent =
@@ -1521,73 +1589,66 @@
       document.getElementById('confirmModal').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
-
     function closeConfirm() {
       pendingDeleteId = null;
       document.getElementById('confirmModal').classList.remove('open');
       document.body.style.overflow = '';
     }
-
     function handleConfirmBackdrop(e) {
       if (e.target === document.getElementById('confirmModal')) closeConfirm();
     }
-
     function confirmDelete() {
       if (pendingDeleteId === null) return;
-      var idx = prodacts.findIndex(function (p) { return p.id === pendingDeleteId; });
-      var name = prodacts[idx] ? prodacts[idx].nameEn : 'Product';
-      if (idx > -1) prodacts.splice(idx, 1);
-      DC_saveProducts(prodacts);
-      closeConfirm();
-      renderTable();
-      showToast('🗑️ "' + name + '" deleted.', 'info');
+      var p    = allProducts.find(function (x) { return x.id === pendingDeleteId; });
+      var name = p ? p.nameEn : 'Product';
+      DermaCareDB.deleteProduct(pendingDeleteId, function (err) {
+        if (err) { showToast('❌ Delete failed.', 'error'); return; }
+        closeConfirm();
+        showToast('🗑️ "' + name + '" deleted.', 'info');
+        loadAndRender();
+      });
     }
 
-    /* ── Toast ───────────────────────────────────────────────────────── */
+    /* ── Toast ───────────────────────────────────────────────────── */
     function showToast(msg, type) {
       var container = document.getElementById('toastContainer');
       var toast = document.createElement('div');
-      toast.className = 'toast ' + (type || '');
+      toast.className   = 'toast ' + (type || '');
       toast.textContent = msg;
       container.appendChild(toast);
-
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { toast.classList.add('show'); });
       });
-
       setTimeout(function () {
         toast.classList.remove('show');
-        setTimeout(function () { container.removeChild(toast); }, 400);
+        setTimeout(function () { if(container.contains(toast)) container.removeChild(toast); }, 400);
       }, 3200);
     }
 
-    /* ── Keyboard Shortcuts ──────────────────────────────────────────── */
+    /* ── Keyboard shortcuts ──────────────────────────────────────── */
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
         if (document.getElementById('productModal').classList.contains('open')) closeModal();
         if (document.getElementById('confirmModal').classList.contains('open')) closeConfirm();
       }
-      /* Ctrl/Cmd + K — focus search */
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         document.getElementById('searchInput').focus();
       }
     });
 
-    /* ── Login / Logout ─────────────────────────────────────────── */
+    /* ── Login / Logout ──────────────────────────────────────────── */
     function handleLogin(e) {
       e.preventDefault();
-      var email = document.getElementById('loginEmail').value.trim();
+      var email    = document.getElementById('loginEmail').value.trim();
       var password = document.getElementById('loginPassword').value;
-      var errEl = document.getElementById('loginError');
+      var errEl    = document.getElementById('loginError');
       if (DC_adminLogin(email, password)) {
         errEl.textContent = '';
         var overlay = document.getElementById('loginOverlay');
         overlay.classList.add('hidden');
         setTimeout(function () { overlay.style.display = 'none'; }, 360);
-        // Reload products (they may have been updated since last session)
-        prodacts = DC_getProducts();
-        renderTable();
+        initDashboard();
         showToast('🌸 Welcome back, Admin!', 'success');
       } else {
         errEl.textContent = '❌ Incorrect email or password. Please try again.';
@@ -1595,25 +1656,22 @@
         document.getElementById('loginPassword').focus();
       }
     }
+    function handleLogout() { DC_adminLogout(); window.location.reload(); }
 
-    function handleLogout() {
-      DC_adminLogout();
-      window.location.reload();
+    /* ── Init dashboard: seed DB on first visit, then render ─────── */
+    function initDashboard() {
+      DermaCareDB.seedIfEmpty(DEFAULT_PRODUCTS, function () {
+        loadAndRender();
+      });
     }
 
-    /* ── Init ────────────────────────────────────────────────────────── */
+    /* ── Boot ────────────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {
       if (DC_isAdminLoggedIn()) {
-        // Already logged in — hide overlay immediately
-        var overlay = document.getElementById('loginOverlay');
-        overlay.style.display = 'none';
-        prodacts = DC_getProducts();
-        renderTable();
+        document.getElementById('loginOverlay').style.display = 'none';
+        initDashboard();
       } else {
-        // Show login; focus email field
-        setTimeout(function () {
-          document.getElementById('loginEmail').focus();
-        }, 200);
+        setTimeout(function () { document.getElementById('loginEmail').focus(); }, 200);
       }
     });
   </script>
